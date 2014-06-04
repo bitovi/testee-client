@@ -1,0 +1,35 @@
+{
+  "name": "testee-client",
+  "version": "0.0.1",
+  "description": "Testee testing framework client adapters",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "grunt test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bitovi/testee-client.git"
+  },
+  "keywords": [
+    "testing",
+    "qunit",
+    "mocha",
+    "jasmine"
+  ],
+  "author": "David Luecke <david@bitovi.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bitovi/testee-client/issues"
+  },
+  "homepage": "https://github.com/bitovi/testee-client",
+  "dependencies": {},
+  "devDependencies": {
+    "browserify": "^4.1.8",
+    "grunt": "^0.4.5",
+    "grunt-browserify": "^2.1.0",
+    "grunt-cli": "^0.1.13",
+    "grunt-contrib-jshint": "^0.10.0",
+    "grunt-contrib-watch": "^0.6.1",
+    "underscore": "^1.6.0"
+  }
+}
