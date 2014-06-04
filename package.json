@@ -24,6 +24,7 @@
   "homepage": "https://github.com/bitovi/testee-client",
   "dependencies": {},
   "devDependencies": {
+    "bower": "^1.3.4",
     "browserify": "^4.1.8",
     "grunt": "^0.4.5",
     "grunt-browserify": "^2.1.0",
