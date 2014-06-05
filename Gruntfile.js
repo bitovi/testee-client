@@ -10,17 +10,29 @@ module.exports = function (grunt) {
 			lib: ['lib/**/*.js', 'Gruntfile.js'],
 			test: 'test/*.test.js'
 		},
+    uglify: {
+      dist: {
+        files: {
+          'dist/testee.min.js': 'dist/testee.js'
+        }
+      }
+    },
 		browserify: {
 			dist: {
 				files: {
 					'dist/testee.js': ['lib/index.js']
 				}
 			},
-			options: {
-				bundleOptions: {
-					debug: true
-				}
-			}
+      debug: {
+        options: {
+          bundleOptions: {
+            debug: true
+          }
+        },
+        files: {
+          'dist/testee.dev.js': ['lib/index.js']
+        }
+      }
 		},
 		qunit: {
 			test: ['test/index.html']
@@ -36,9 +48,10 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-contrib-qunit');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-browserify');
 
-	grunt.registerTask('build', ['browserify']);
+	grunt.registerTask('build', ['browserify', 'uglify']);
 	grunt.registerTask('test', ['jshint', 'build', 'qunit']);
 	grunt.registerTask('default', ['watch']);
 };

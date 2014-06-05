@@ -3,20 +3,6 @@
 		socket: new window.EventEmitter()
 	};
 
-	//	var old = options.socket.emit;
-	//	var messages = [];
-	//	options.socket.emit = function(name, data, other) {
-	//		messages.push({
-	//			name: name,
-	//			data: typeof data === 'string' ? other : data
-	//		});
-	//		return old.apply(this, arguments);
-	//	};
-	//
-	//	options.socket.on('runs::patch', function() {
-	//		console.log(JSON.stringify(messages, null, '  '));
-	//	});
-
 	module('Jasmine 1.x adapter test');
 
 	var expected = [

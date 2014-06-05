@@ -2,7 +2,7 @@
   "name": "testee-client",
   "version": "0.0.1",
   "description": "Testee testing framework client adapters",
-  "main": "lib/index.js",
+  "main": "dist/testee.js",
   "scripts": {
     "test": "grunt test"
   },
