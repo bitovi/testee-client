@@ -84,7 +84,8 @@ _.extend(TesteeReporter.prototype, {
 			this.runner.suite({
 				title: suite.description,
 				root: true,
-				id: this.id(this.suites, suite.id)
+				id: this.id(this.suites, suite.id),
+        parent: this.runId
 			});
 		}
 
@@ -146,12 +147,14 @@ function TesteeReporter(runner) {
   this.total = 0;
   this.pending = 0;
   this.failed = 0;
+  this.runId = guid();
 
   pipe('start', function() {
     return {
       environment: navigator.userAgent,
       runner: 'Mocha',
-      time: new Date().getTime()
+      time: new Date().getTime(),
+      id: self.runId
     };
   });
 
@@ -166,6 +169,8 @@ function TesteeReporter(runner) {
 
   pipe('end', function(data) {
     var diff = self.diff(data);
+
+    diff.id = self.runId;
     diff.total = self.total;
     diff.failed = self.failed;
     diff.pending = self.pending;
@@ -174,7 +179,16 @@ function TesteeReporter(runner) {
     return diff;
   });
 
-  _.each(['suite', 'suite end', 'pending', 'test', 'test end', 'pass'], function(name) {
+  pipe('suite', function(data) {
+    var diff = self.diff(data);
+    if(data.root) {
+      diff.parent = self.runId;
+    }
+
+    return diff;
+  });
+
+  _.each(['suite end', 'pending', 'test', 'test end', 'pass'], function(name) {
     pipe(name, _.bind(self.diff, self));
   });
 
@@ -231,6 +245,7 @@ TesteeReporter.prototype.diff = function(obj) {
 
   self.last[idx] = current;
   result.id = self.uuids[idx];
+
   return result;
 };
 
@@ -253,7 +268,7 @@ module.exports = function (win, Runner) {
 	var suiteId = function () {
 		return suites[suites.length - 1];
 	};
-	var testId = guid();
+	var runId = guid();
 
 	// TODO async tests
 	// var oldstart = win.start;
@@ -264,7 +279,7 @@ module.exports = function (win, Runner) {
 		var suite = guid();
 
 		Runner.start({
-			id: testId,
+			id: runId,
 			environment: win.navigator.userAgent,
 			runner: 'QUnit',
 			time: new Date().getTime()
@@ -273,7 +288,8 @@ module.exports = function (win, Runner) {
 		Runner.suite({
 			title: titleEl ? titleEl.innerHTML : '',
 			root: true,
-			id: suite
+			id: suite,
+      parent: runId
 		});
 
 		suites.push(suite);
@@ -350,7 +366,7 @@ module.exports = function (win, Runner) {
 	});
 
 	QUnit.done(function (data) {
-		data.id = testId;
+		data.id = runId;
 
 		Runner.end(data);
 	});
@@ -402,9 +418,10 @@ if (window.mocha && window.Mocha) {
 
 },{"./adapters/jasmine-legacy":1,"./adapters/mocha":2,"./adapters/qunit":3,"./runner":6,"./service":7,"underscore":8}],6:[function(require,module,exports){
 var _ = require('underscore');
-var noop = function() {};
 
 module.exports = function (options) {
+  var noop = function() {};
+
 	return _.extend({
 		start: function (data) {
 			data = _.extend({ status: 'running' }, data);
@@ -449,7 +466,7 @@ module.exports = function (options) {
 				this.coverages.create({
 					id: data.id,
 					coverage: window.__coverage__
-				}, {}, _.noop);
+				}, {}, noop);
 			}
 
 			this.runs.patch(data.id, data, {}, noop);
