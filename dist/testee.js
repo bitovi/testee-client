@@ -139,6 +139,7 @@ function TesteeReporter(runner) {
     });
   };
 
+  this.originalReporter = new this.OldReporter(runner);
   this.ids = [];
   this.uuids = {};
   this.last = {};
@@ -235,6 +236,7 @@ TesteeReporter.prototype.diff = function(obj) {
 
 module.exports = function(win, api) {
   TesteeReporter.prototype.api = api;
+  TesteeReporter.prototype.OldReporter = win.mocha._reporter;
   win.Mocha.reporters.Testee = TesteeReporter;
   win.mocha.reporter(TesteeReporter);
 };
@@ -400,43 +402,44 @@ if (window.mocha && window.Mocha) {
 
 },{"./adapters/jasmine-legacy":1,"./adapters/mocha":2,"./adapters/qunit":3,"./runner":6,"./service":7,"underscore":8}],6:[function(require,module,exports){
 var _ = require('underscore');
+var noop = function() {};
 
 module.exports = function (options) {
 	return _.extend({
 		start: function (data) {
 			data = _.extend({ status: 'running' }, data);
-			this.runs.create(data, {}, _.noop);
+			this.runs.create(data, {}, noop);
 		},
 
 		suite: function (data) {
 			data = _.extend({ status: 'running' }, data);
-			this.suites.create(data, {}, _.noop);
+			this.suites.create(data, {}, noop);
 		},
 
 		test: function (data) {
-			this.tests.create(data, {}, _.noop);
+			this.tests.create(data, {}, noop);
 		},
 
 		pending: function (data) {
       data = _.extend({ status: 'pending' }, data);
-			this.tests.create(data, {}, _.noop);
+			this.tests.create(data, {}, noop);
 		},
 
 		pass: function (data) {
 			data = _.extend({ status: 'passed' }, data);
-			this.tests.patch(data.id, data, {}, _.noop);
+			this.tests.patch(data.id, data, {}, noop);
 		},
 
 		fail: function (data) {
 			data = _.extend({ status: 'failed' }, data);
-			this.tests.patch(data.id, data, {}, _.noop);
+			this.tests.patch(data.id, data, {}, noop);
 		},
 
 		testEnd: function () {},
 
 		suiteEnd: function (data) {
 			data = _.extend({ status: 'finished' }, data);
-			this.suites.patch(data.id, data, {}, _.noop);
+			this.suites.patch(data.id, data, {}, noop);
 		},
 
 		end: function (data) {
@@ -446,10 +449,10 @@ module.exports = function (options) {
 				this.coverages.create({
 					id: data.id,
 					coverage: window.__coverage__
-				}, {}, _._.noop);
+				}, {}, _.noop);
 			}
 
-			this.runs.patch(data.id, data, {}, _.noop);
+			this.runs.patch(data.id, data, {}, noop);
 		}
 	}, options);
 };
