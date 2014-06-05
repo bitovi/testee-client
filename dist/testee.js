@@ -418,6 +418,7 @@ module.exports = function (options) {
 		},
 
 		pending: function (data) {
+      data = _.extend({ status: 'pending' }, data);
 			this.tests.create(data, {}, _.noop);
 		},
 

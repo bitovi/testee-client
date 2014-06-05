@@ -48,7 +48,8 @@
         "sync": true,
         "timedOut": false,
         "pending": true,
-        "type": "test"
+        "type": "test",
+        "status": "pending"
       }
     },
     {
