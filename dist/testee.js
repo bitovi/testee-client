@@ -351,11 +351,13 @@ module.exports = function (win, Runner) {
 			errorMessage = data.expected ? 'Expected ' + data.expected + ' but was ' + data.actual :
 				'Expected assertion to be truthy but it was not';
 
+			var stack = (data.source || '').replace(/\\n/g, '\n\t');
+
 			Runner.fail({
 				id: testId,
 				err: {
-					message: data.message,
-					stack: errorMessage + '\n    ' + (data.source || '')
+					message: errorMessage,
+					stack: 'Error: ' + errorMessage + '\n' + stack
 				}
 			});
 		}
