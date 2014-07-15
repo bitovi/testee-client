@@ -47,7 +47,7 @@
 			"data": {
 				"status": "failed",
 				"err": {
-					"message": "This test should fail"
+					"message": "Expected B but was A"
 				}
 			}
 		},
@@ -130,6 +130,9 @@
 				"total": 1
 			}
 		},
+    {
+      "name": "suites::patch"
+    },
 		{
 			"name": "runs::patch",
 			"data": {

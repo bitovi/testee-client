@@ -268,6 +268,12 @@ module.exports = function (win, Runner) {
 	var suiteId = function () {
 		return suites[suites.length - 1];
 	};
+  var endSuite = function () {
+    Runner.suiteEnd({
+      id: suiteId()
+    });
+    suites.pop();
+  };
 	var runId = guid();
 
 	// TODO async tests
@@ -326,12 +332,7 @@ module.exports = function (win, Runner) {
 		suites.push(id);
 	});
 
-	QUnit.testDone(function () {
-		Runner.suiteEnd({
-			id: suiteId()
-		});
-		suites.pop();
-	});
+	QUnit.testDone(endSuite);
 
 	QUnit.log(function (data) {
 		var testId = guid();
@@ -369,7 +370,7 @@ module.exports = function (win, Runner) {
 
 	QUnit.done(function (data) {
 		data.id = runId;
-
+    endSuite();
 		Runner.end(data);
 	});
 
