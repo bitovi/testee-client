@@ -11,7 +11,8 @@
 			"data": {
 				"status": "running",
 				"environment": navigator.userAgent,
-				"runner": "QUnit"
+				"runner": "QUnit",
+        "file": /qunit\/qunit\.html/
 			}
 		},
 		{
@@ -19,27 +20,31 @@
 			"data": {
 				"status": "running",
 				"title": "QUnit example",
-				"root": true
+				"root": true,
+        "file": /qunit\/qunit\.html/
 			}
 		},
 		{
 			"name": "suites::create",
 			"data": {
 				"status": "running",
-				"title": "Test module"
+				"title": "Test module",
+        "file": /qunit\/qunit\.html/
 			}
 		},
 		{
 			"name": "suites::create",
 			"data": {
 				"status": "running",
-				"title": "A failing test"
+				"title": "A failing test",
+        "file": /qunit\/qunit\.html/
 			}
 		},
 		{
 			"name": "tests::create",
 			"data": {
-				"title": "This test should fail"
+				"title": "This test should fail",
+        "file": /qunit\/qunit\.html/
 			}
 		},
 		{
@@ -61,13 +66,15 @@
 			"name": "suites::create",
 			"data": {
 				"status": "running",
-				"title": "It does something"
+				"title": "It does something",
+        "file": /qunit\/qunit\.html/
 			}
 		},
 		{
 			"name": "tests::create",
 			"data": {
-				"title": "Test ran!"
+				"title": "Test ran!",
+        "file": /qunit\/qunit\.html/
 			}
 		},
 		{
@@ -94,20 +101,23 @@
 			"name": "suites::create",
 			"data": {
 				"status": "running",
-				"title": "Other module"
+				"title": "Other module",
+        "file": /qunit\/qunit\.html/
 			}
 		},
 		{
 			"name": "suites::create",
 			"data": {
-				"status": "running",
-				"title": "It does something async"
-			}
+        "status": "running",
+        "title": "It does something async",
+        "file": /qunit\/qunit\.html/
+      }
 		},
 		{
 			"name": "tests::create",
 			"data": {
-				"title": "Async test ran!"
+				"title": "Async test ran!",
+        "file": /qunit\/qunit\.html/
 			}
 		},
 		{
@@ -132,6 +142,14 @@
 		},
     {
       "name": "suites::patch"
+    },
+    {
+      "name": "coverages::create",
+      "data": {
+        coverage: {
+          "test": "Qunit coverage"
+        }
+      }
     },
 		{
 			"name": "runs::patch",

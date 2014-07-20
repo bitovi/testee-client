@@ -11,7 +11,8 @@
       "data": {
         "status": "running",
         "environment": navigator.userAgent,
-        "runner": "Mocha"
+        "runner": "Mocha",
+        "file": /mocha\/mocha\.html/
       }
     },
     {
@@ -20,7 +21,8 @@
         "status": "running",
         "title": "",
         "pending": false,
-        "root": true
+        "root": true,
+        "file": /mocha\/mocha\.html/
       }
     },
     {
@@ -29,7 +31,8 @@
         "status": "running",
         "title": "Test module",
         "pending": false,
-        "root": false
+        "root": false,
+        "file": /mocha\/mocha\.html/
       }
     },
     {
@@ -38,7 +41,8 @@
         "status": "running",
         "title": "It does something",
         "pending": false,
-        "root": false
+        "root": false,
+        "file": /mocha\/mocha\.html/
       }
     },
     {
@@ -49,7 +53,8 @@
         "timedOut": false,
         "pending": true,
         "type": "test",
-        "status": "pending"
+        "status": "pending",
+        "file": /mocha\/mocha\.html/
       }
     },
     {
@@ -60,7 +65,8 @@
         "sync": true,
         "timedOut": false,
         "pending": false,
-        "type": "test"
+        "type": "test",
+        "file": /mocha\/mocha\.html/
       }
     },
     {
@@ -85,7 +91,8 @@
         "status": "running",
         "title": "Some other suite",
         "pending": false,
-        "root": false
+        "root": false,
+        "file": /mocha\/mocha\.html/
       }
     },
     {
@@ -94,7 +101,8 @@
         "status": "running",
         "title": "Nested suite",
         "pending": false,
-        "root": false
+        "root": false,
+        "file": /mocha\/mocha\.html/
       }
     },
     {
@@ -105,7 +113,8 @@
         "sync": true,
         "timedOut": false,
         "pending": false,
-        "type": "test"
+        "type": "test",
+        "file": /mocha\/mocha\.html/
       }
     },
     {
@@ -124,7 +133,8 @@
         "sync": false,
         "timedOut": false,
         "pending": false,
-        "type": "test"
+        "type": "test",
+        "file": /mocha\/mocha\.html/
       }
     },
     {
@@ -156,6 +166,14 @@
       "name": "suites::patch",
       "data": {
         "status": "finished"
+      }
+    },
+    {
+      "name": "coverages::create",
+      "data": {
+        coverage: {
+          "test": "Mocha coverage"
+        }
       }
     },
     {

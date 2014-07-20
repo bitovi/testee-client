@@ -1,11 +1,17 @@
 // Recursively compares if an actual object has the same properties
 var compare = window.compare = function (reference, actual, name) {
+  var expected, current;
 	for(var key in reference) {
-		if(typeof reference[key] === 'object') {
-			compare(reference[key], actual[key], name + ' ' + key);
-		} else {
-			equal(reference[key], actual[key], name + ' ' + key);
-		}
+    expected = reference[key];
+    current = actual[key];
+
+    if(expected instanceof RegExp) {
+      ok(expected.test(current), name + ': ' + current + ' matches ' + expected.toString());
+    } else if(typeof reference[key] === 'object') {
+      compare(expected, current, name + ' ' + key);
+    } else {
+      equal(expected, current, name + ' ' + key + ' === ' + expected);
+    }
 	}
 };
 
@@ -49,5 +55,4 @@ window.logSocketData = function(socket) {
 	socket.on('runs::patch', function() {
 		console.log(JSON.stringify(messages, null, '  '));
 	});
-}
-
+};

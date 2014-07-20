@@ -11,7 +11,8 @@
 			"data": {
 				"status": "running",
 				"environment": navigator.userAgent,
-				"runner": "Jasmine"
+				"runner": "Jasmine",
+        "file": /jasmine-1\/jasmine\.html/
 			}
 		},
 		{
@@ -19,20 +20,23 @@
 			"data": {
 				"status": "running",
 				"title": "Test module",
-				"root": true
+				"root": true,
+        "file": /jasmine-1\/jasmine\.html/
 			}
 		},
 		{
 			"name": "suites::create",
 			"data": {
 				"status": "running",
-				"title": "It does something"
+				"title": "It does something",
+        "file": /jasmine-1\/jasmine\.html/
 			}
 		},
 		{
 			"name": "tests::create",
 			"data": {
-				"title": "Fails"
+				"title": "Fails",
+        "file": /jasmine-1\/jasmine\.html/
 			}
 		},
 		{
@@ -54,14 +58,16 @@
 			"name": "suites::create",
 			"data": {
 				"status": "running",
-				"title": "Some other suite"
+				"title": "Some other suite",
+        "file": /jasmine-1\/jasmine\.html/
 			}
 		},
 		{
 			"name": "suites::create",
 			"data": {
 				"status": "running",
-				"title": "Nested suite"
+				"title": "Nested suite",
+        "file": /jasmine-1\/jasmine\.html/
 			}
 		},
 		{
@@ -94,6 +100,14 @@
 				"status": "finished"
 			}
 		},
+    {
+      "name": "coverages::create",
+      "data": {
+        coverage: {
+          "test": "Jasmine coverage"
+        }
+      }
+    },
 		{
 			"name": "runs::patch",
 			"data": {

@@ -402,7 +402,8 @@ options.socket = options.socket || io.connect();
 _.defaults(options, {
 	runs: service('runs', options.socket),
 	suites: service('suites', options.socket),
-	tests: service('tests', options.socket)
+	tests: service('tests', options.socket),
+  coverages: service('coverages', options.socket)
 });
 
 var runner = Runner(options);
@@ -424,24 +425,30 @@ var _ = require('underscore');
 
 module.exports = function (options) {
   var noop = function() {};
+  var file = { file: window.location.toString() };
 
 	return _.extend({
 		start: function (data) {
-			data = _.extend({ status: 'running' }, data);
+			data = _.extend({
+        status: 'running'
+      }, file, data);
 			this.runs.create(data, {}, noop);
 		},
 
 		suite: function (data) {
-			data = _.extend({ status: 'running' }, data);
+			data = _.extend({
+        status: 'running'
+      }, file, data);
 			this.suites.create(data, {}, noop);
 		},
 
 		test: function (data) {
+      data = _.extend({}, file, data);
 			this.tests.create(data, {}, noop);
 		},
 
 		pending: function (data) {
-      data = _.extend({ status: 'pending' }, data);
+      data = _.extend({ status: 'pending' }, file, data);
 			this.tests.create(data, {}, noop);
 		},
 
@@ -468,6 +475,7 @@ module.exports = function (options) {
 			if (window.__coverage__ && this.coverages) {
 				this.coverages.create({
 					id: data.id,
+          run: data,
 					coverage: window.__coverage__
 				}, {}, noop);
 			}
