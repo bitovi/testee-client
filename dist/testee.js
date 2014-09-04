@@ -122,7 +122,7 @@ module.exports = function (win, runner) {
 
 module.exports.Reporter = TesteeReporter;
 
-},{"./../guid":4,"underscore":19}],2:[function(require,module,exports){
+},{"./../guid":5,"underscore":20}],2:[function(require,module,exports){
 var _ = require('underscore');
 var guid = require('./../guid');
 
@@ -258,7 +258,7 @@ module.exports = function(win, api) {
 
 module.exports.Reporter = TesteeReporter;
 
-},{"./../guid":4,"underscore":19}],3:[function(require,module,exports){
+},{"./../guid":5,"underscore":20}],3:[function(require,module,exports){
 var guid = require('./../guid');
 
 module.exports = function (win, Runner) {
@@ -377,7 +377,114 @@ module.exports = function (win, Runner) {
 	return QUnit;
 };
 
-},{"./../guid":4}],4:[function(require,module,exports){
+},{"./../guid":5}],4:[function(require,module,exports){
+"use strict";
+
+var domReadyCallback = function() {
+};
+// Define a local copy of $
+var $ = function(callback) {
+  readyBound = false;
+  $.isReady = false;
+  if(typeof callback === "function") {
+    domReadyCallback = callback;
+  }
+  bindReady();
+};
+
+// Use the correct document accordingly with window argument (sandbox)
+var doc = window.document;
+var readyBound = false;
+// The ready event handler
+var DOMContentLoaded = function() {
+  if(doc.addEventListener) {
+    doc.removeEventListener("DOMContentLoaded", DOMContentLoaded, false);
+  } else {
+    // we're here because readyState !== "loading" in oldIE
+    // which is good enough for us to call the dom ready!
+    doc.detachEvent("onreadystatechange", DOMContentLoaded);
+  }
+  domReady();
+};
+
+// Handle when the DOM is ready
+var domReady = function() {
+  // Make sure that the DOM is not already loaded
+  if(!$.isReady) {
+    // Make sure body exists, at least, in case IE gets a little overzealous (ticket #5443).
+    if(!doc.body) {
+      return setTimeout(domReady, 1);
+    }
+    // Remember that the DOM is ready
+    $.isReady = true;
+    // If there are functions bound, to execute
+    domReadyCallback();
+    // Execute all of them
+  }
+}; // /ready()
+
+var bindReady = function() {
+  var toplevel = false;
+
+  if(readyBound) {
+    return;
+  }
+  readyBound = true;
+
+  // Catch cases where $ is called after the
+  // browser event has already occurred.
+  if(doc.readyState !== "loading") {
+    domReady();
+  }
+
+  // Mozilla, Opera and webkit nightlies currently support this event
+  if(doc.addEventListener) {
+    // Use the handy event callback
+    doc.addEventListener("DOMContentLoaded", DOMContentLoaded, false);
+    // A fallback to window.onload, that will always work
+    window.addEventListener("load", DOMContentLoaded, false);
+    // If IE event model is used
+  } else if(doc.attachEvent) {
+    // ensure firing before onload,
+    // maybe late but safe also for iframes
+    doc.attachEvent("onreadystatechange", DOMContentLoaded);
+    // A fallback to window.onload, that will always work
+    window.attachEvent("onload", DOMContentLoaded);
+    // If IE and not a frame
+    // continually check to see if the document is ready
+    try {
+      toplevel = window.frameElement == null;
+    } catch(e) {
+    }
+    if(doc.documentElement.doScroll && toplevel) {
+      doScrollCheck();
+    }
+  }
+};
+
+// The DOM ready check for Internet Explorer
+var doScrollCheck = function() {
+  if($.isReady) {
+    return;
+  }
+  try {
+    // If IE is used, use the trick by Diego Perini
+    // http://javascript.nwbox.com/IEContentLoaded/
+    doc.documentElement.doScroll("left");
+  } catch(error) {
+    setTimeout(doScrollCheck, 1);
+    return;
+  }
+  // and execute any waiting functions
+  domReady();
+};
+
+// Is the DOM ready to be used? Set to true once it occurs.
+$.isReady = false;
+
+module.exports = $;
+
+},{}],5:[function(require,module,exports){
 // Simple JavaScript GUID
 // See http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
 module.exports = function() {
@@ -387,10 +494,11 @@ module.exports = function() {
 	});
 };
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 var _ = require('underscore');
 var Promise = require('es6-promise').Promise;
 
+var ready = require('./docready');
 var Runner = require('./runner');
 var service = require('./service');
 
@@ -398,45 +506,48 @@ var setupQunit = require('./adapters/qunit');
 var setupJasmineLegacy = require('./adapters/jasmine-legacy');
 var setupMocha = require('./adapters/mocha');
 
-var options = window.Testee = window.Testee || {};
-options.socket = options.socket || io();
+ready(function() {
+  var options = window.Testee = window.Testee || {};
+  options.socket = options.socket || io();
 
-_.defaults(options, {
-  runs: service('runs', options.socket),
-  suites: service('suites', options.socket),
-  tests: service('tests', options.socket),
-  coverages: service('coverages', options.socket),
-  connect: new Promise(function(resolve) {
-    var done = function() {
-      // We need to defer another tick. For some reason
-      // PhantomJS won't send the runs::create event otherwise
-      _.defer(function() {
-        resolve(options.socket);
-      });
-    };
+  _.defaults(options, {
+    runs: service('runs', options.socket),
+    suites: service('suites', options.socket),
+    tests: service('tests', options.socket),
+    coverages: service('coverages', options.socket),
+    connect: new Promise(function(resolve) {
+      var done = function() {
+        // We need to add a timeout because PhantomJS for some reason
+        // sends the runs::create event too soon
+        _.delay(function() {
+          resolve(options.socket);
+        }, 250);
+      };
 
-    if(!options.socket.connected) {
-      options.socket.on('connect', done);
-    } else {
-      done();
-    }
-  })
+      if(!options.socket.connected) {
+        options.socket.on('connect', done);
+      } else {
+        done();
+      }
+    })
+  });
+
+  var runner = Runner(options);
+
+  if (window.QUnit) {
+    setupQunit(window, runner);
+  }
+
+  if (window.jasmine && window.jasmine.version_ && window.jasmine.version_.major === 1) {
+    setupJasmineLegacy(window, runner);
+  }
+
+  if (window.mocha && window.Mocha) {
+    setupMocha(window, runner);
+  }
 });
 
-var runner = Runner(options);
-
-if (window.QUnit) {
-  setupQunit(window, runner);
-}
-
-if (window.jasmine && window.jasmine.version_ && window.jasmine.version_.major === 1) {
-  setupJasmineLegacy(window, runner);
-}
-
-if (window.mocha && window.Mocha) {
-  setupMocha(window, runner);
-}
-},{"./adapters/jasmine-legacy":1,"./adapters/mocha":2,"./adapters/qunit":3,"./runner":6,"./service":7,"es6-promise":9,"underscore":19}],6:[function(require,module,exports){
+},{"./adapters/jasmine-legacy":1,"./adapters/mocha":2,"./adapters/qunit":3,"./docready":4,"./runner":7,"./service":8,"es6-promise":10,"underscore":20}],7:[function(require,module,exports){
 var _ = require('underscore');
 var Promise = require('es6-promise').Promise;
 
@@ -447,6 +558,7 @@ module.exports = function (options) {
     call: function(path, method) {
       var args = _.toArray(arguments).slice(2);
       var service = this[path];
+
 
       // Chain this service call to make sure it only runs
       // after all previous returned with an ACK
@@ -524,7 +636,7 @@ module.exports = function (options) {
 	}, options);
 };
 
-},{"es6-promise":9,"underscore":19}],7:[function(require,module,exports){
+},{"es6-promise":10,"underscore":20}],8:[function(require,module,exports){
 var _ = require('underscore');
 var stripSlashes = function (name) {
 	return name.replace(/^\/|\/$/g, '');
@@ -557,7 +669,7 @@ module.exports = function(path, socket) {
 
 module.exports.Service = Service;
 
-},{"underscore":19}],8:[function(require,module,exports){
+},{"underscore":20}],9:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -622,13 +734,13 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 var Promise = require("./promise/promise").Promise;
 var polyfill = require("./promise/polyfill").polyfill;
 exports.Promise = Promise;
 exports.polyfill = polyfill;
-},{"./promise/polyfill":13,"./promise/promise":14}],10:[function(require,module,exports){
+},{"./promise/polyfill":14,"./promise/promise":15}],11:[function(require,module,exports){
 "use strict";
 /* global toString */
 
@@ -722,7 +834,7 @@ function all(promises) {
 }
 
 exports.all = all;
-},{"./utils":18}],11:[function(require,module,exports){
+},{"./utils":19}],12:[function(require,module,exports){
 (function (process,global){
 "use strict";
 var browserGlobal = (typeof window !== 'undefined') ? window : {};
@@ -786,7 +898,7 @@ function asap(callback, arg) {
 
 exports.asap = asap;
 }).call(this,require("FWaASH"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"FWaASH":8}],12:[function(require,module,exports){
+},{"FWaASH":9}],13:[function(require,module,exports){
 "use strict";
 var config = {
   instrument: false
@@ -802,7 +914,7 @@ function configure(name, value) {
 
 exports.config = config;
 exports.configure = configure;
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 (function (global){
 "use strict";
 /*global self*/
@@ -843,7 +955,7 @@ function polyfill() {
 
 exports.polyfill = polyfill;
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./promise":14,"./utils":18}],14:[function(require,module,exports){
+},{"./promise":15,"./utils":19}],15:[function(require,module,exports){
 "use strict";
 var config = require("./config").config;
 var configure = require("./config").configure;
@@ -1055,7 +1167,7 @@ function publishRejection(promise) {
 }
 
 exports.Promise = Promise;
-},{"./all":10,"./asap":11,"./config":12,"./race":15,"./reject":16,"./resolve":17,"./utils":18}],15:[function(require,module,exports){
+},{"./all":11,"./asap":12,"./config":13,"./race":16,"./reject":17,"./resolve":18,"./utils":19}],16:[function(require,module,exports){
 "use strict";
 /* global toString */
 var isArray = require("./utils").isArray;
@@ -1145,7 +1257,7 @@ function race(promises) {
 }
 
 exports.race = race;
-},{"./utils":18}],16:[function(require,module,exports){
+},{"./utils":19}],17:[function(require,module,exports){
 "use strict";
 /**
   `RSVP.reject` returns a promise that will become rejected with the passed
@@ -1193,7 +1305,7 @@ function reject(reason) {
 }
 
 exports.reject = reject;
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 "use strict";
 function resolve(value) {
   /*jshint validthis:true */
@@ -1209,7 +1321,7 @@ function resolve(value) {
 }
 
 exports.resolve = resolve;
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 "use strict";
 function objectOrFunction(x) {
   return isFunction(x) || (typeof x === "object" && x !== null);
@@ -1232,7 +1344,7 @@ exports.objectOrFunction = objectOrFunction;
 exports.isFunction = isFunction;
 exports.isArray = isArray;
 exports.now = now;
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 //     Underscore.js 1.6.0
 //     http://underscorejs.org
 //     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -2577,4 +2689,4 @@ exports.now = now;
   }
 }).call(this);
 
-},{}]},{},[5])
+},{}]},{},[6])
