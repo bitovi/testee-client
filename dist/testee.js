@@ -438,59 +438,74 @@ if (window.mocha && window.Mocha) {
 }
 },{"./adapters/jasmine-legacy":1,"./adapters/mocha":2,"./adapters/qunit":3,"./runner":6,"./service":7,"es6-promise":9,"underscore":19}],6:[function(require,module,exports){
 var _ = require('underscore');
+var Promise = require('es6-promise').Promise;
 
 module.exports = function (options) {
-  var noop = function() {};
   var file = { file: window.location.toString() };
 
 	return _.extend({
     call: function(path, method) {
       var args = _.toArray(arguments).slice(2);
-      return this.connect.then(_.bind(function() {
-        var service = this[path];
-        service[method].apply(service, args);
-      }, this));
+      var service = this[path];
+
+      // Chain this service call to make sure it only runs
+      // after all previous returned with an ACK
+      this.connect = this.connect.then(function() {
+        return new Promise(function(resolve, reject) {
+          args.push({});
+          args.push(function(error, data) {
+            if(error) {
+              reject(data);
+            } else {
+              resolve(data);
+            }
+          });
+          service[method].apply(service, args);
+        });
+      });
+
+      return this.connect;
     },
 
 		start: function (data) {
 			data = _.extend({
         status: 'running'
       }, file, data);
-      this.call('runs', 'create', data, {}, noop);
+      this.call('runs', 'create', data);
 		},
 
 		suite: function (data) {
 			data = _.extend({
         status: 'running'
       }, file, data);
-			this.call('suites', 'create', data, {}, noop);
+			this.call('suites', 'create', data);
 		},
 
 		test: function (data) {
       data = _.extend({}, file, data);
-			this.call('tests', 'create', data, {}, noop);
+			this.call('tests', 'create', data);
 		},
 
 		pending: function (data) {
       data = _.extend({ status: 'pending' }, file, data);
-			this.call('tests', 'create', data, {}, noop);
+			this.call('tests', 'create', data);
 		},
 
 		pass: function (data) {
 			data = _.extend({ status: 'passed' }, data);
-			this.call('tests', 'patch', data.id, data, {}, noop);
+			this.call('tests', 'patch', data.id, data);
 		},
 
 		fail: function (data) {
 			data = _.extend({ status: 'failed' }, data);
-			this.call('tests', 'patch', data.id, data, {}, noop);
+			this.call('tests', 'patch', data.id, data);
 		},
 
 		testEnd: function () {},
 
 		suiteEnd: function (data) {
 			data = _.extend({ status: 'finished' }, data);
-			this.call('suites', 'patch', data.id, data, {}, noop);
+			this.call('suites', 'patch', data.id, data);
 		},
 
 		end: function (data) {
@@ -501,15 +516,15 @@ module.exports = function (options) {
 					id: data.id,
           run: data,
 					coverage: window.__coverage__
-				}, {}, noop);
+				});
 			}
 
-			this.call('runs', 'patch', data.id, data, {}, noop);
+			this.call('runs', 'patch', data.id, data);
 		}
 	}, options);
 };
 
-},{"underscore":19}],7:[function(require,module,exports){
+},{"es6-promise":9,"underscore":19}],7:[function(require,module,exports){
 var _ = require('underscore');
 var stripSlashes = function (name) {
 	return name.replace(/^\/|\/$/g, '');

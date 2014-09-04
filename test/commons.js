@@ -24,12 +24,16 @@ window.walkExpected = function(expected, socket) {
 		var current = expected[index];
 
 		socket.once(current.name, function(data, other) {
+      var callback = arguments[arguments.length - 1];
+
 			// move data for patch requests which pass the id first
 			if(typeof data === 'string') {
 				data = other;
 			}
 
 			compare(current.data, data, current.name);
+
+      callback(null, data);
 
 			if(++index === expected.length) {
 				return start();
