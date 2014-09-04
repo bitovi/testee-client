@@ -17,17 +17,6 @@
     };
 
     window.expect = chai.expect;
-    window.io = {};
-
-    window.initIo = function(name) {
-      if(!window.io[name]) {
-        window.io[name] = new window.EventEmitter();
-        window.io[name].connect = function() {
-          return this;
-        }
-      }
-      return window.io[name];
-    }
 
     window.__coverage__ = { test: 'Mocha coverage' };
     window.Testee = window.top.Testee.Mocha;

@@ -1,7 +1,5 @@
 (function (window, undefined) {
-	var options = window.Testee.QUnit = {
-		socket: new window.EventEmitter()
-	};
+	var options = window.getTesteeOptions('QUnit');
 
 	module('QUnit adapter test');
 
@@ -23,7 +21,7 @@
 				"root": true,
         "file": /qunit\/qunit\.html/
 			}
-		},
+    },
 		{
 			"name": "suites::create",
 			"data": {

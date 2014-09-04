@@ -1,7 +1,5 @@
 (function(window, undefined) {
-  var options = window.Testee.Mocha = {
-    socket: new window.EventEmitter()
-  };
+  var options = window.getTesteeOptions('Mocha');
 
   module('Mocha adapter test');
 

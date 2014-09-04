@@ -1,7 +1,5 @@
 (function (window, undefined) {
-	var options = window.Testee.Jasmine1 = {
-		socket: new window.EventEmitter()
-	};
+  var options = window.getTesteeOptions('Jasmine1');
 
 	module('Jasmine 1.x adapter test');
 

@@ -56,3 +56,11 @@ window.logSocketData = function(socket) {
 		console.log(JSON.stringify(messages, null, '  '));
 	});
 };
+
+window.getTesteeOptions = function(name) {
+  var options = window.Testee[name] = {
+    socket: new window.EventEmitter()
+  };
+  options.socket.connected = true;
+  return options;
+};
