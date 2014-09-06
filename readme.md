@@ -1,9 +1,20 @@
-# Writing client adapters
+# Testee client adapters
+
+Testee client side adapters for Mocha, QUnit and Jasmine that convert test results into Feathers service socket calls (`runs`, `suites` and `tests`).
 
 A test flow:
 
 ```js
+var ids = {
+  run: guid(),
+  suite: guid(),
+  childsuite: guid(),
+  testpass: guid(),
+  testfail: guid()
+};
+
 Testee.start({
+  id: ids.run,
   environment : navigator.userAgent,
   runner : 'Jasmine'
 });
@@ -11,7 +22,8 @@ Testee.start({
 Testee.suite({
   "title": "Main test suite title",
   "root": true, // If it is the root level test suite
-  "id": 0
+  "id": guid(),
+  "parent": runId
 });
 
 Testee.suite({
