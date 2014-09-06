@@ -2,7 +2,35 @@
 
 Testee client side adapters for Mocha, QUnit and Jasmine that convert test results into Feathers service socket calls (`runs`, `suites` and `tests`).
 
-A test flow:
+## Initializing options
+
+In you test page you can set Testee options using `window.Testee`. To report to a different server for example set:
+
+```html
+<script type="text/javascript">
+window.Testee = {
+  socket: io('http://testee-server.com/')
+}
+</script>
+<script type="text/javascript" src="http://testee-server.com/socket.io/socket.io.js"></script>
+<script type="text/javascript" src="testee-client.js"></script>
+```
+
+When loading files asynchronously:
+
+```html
+<script type="text/javascript">
+window.Testee = {
+  autoinit: false
+}
+
+define(['testee-client', 'qunit'], function() {
+  window.Testee.init();
+});
+</script>
+```
+
+## A test flow:
 
 ```js
 var ids = {
@@ -22,39 +50,39 @@ Testee.start({
 Testee.suite({
   "title": "Main test suite title",
   "root": true, // If it is the root level test suite
-  "id": guid(),
+  "id": ids.suite,
   "parent": runId
 });
 
 Testee.suite({
   "title": "Child test suite",
-  "parent": 0,
-  "id": 1
+  "parent": ids.suite,
+  "id": ids.childsuite
 });
 
 Testee.test({
   "title": "The test title",
-  "parent": 1, // Parent suite id
-  "id": 3
+  "parent": ids.childsuite, // Parent suite id
+  "id": ids.testpass
 });
 
 Testee.pass({
   "duration": 0,
-  "id": 3
+  "id": ids.testpass
 });
 
 Testee.testEnd({
-  "id": 3
+  "id": ids.testspass
 });
 
 Testee.test({
   "title": "A failing test",
-  "parent": 1,
-  "id": 4
+  "parent": ids.childsuite,
+  "id": ids.testfail
 });
 
 Testee.fail({
-  "id": 4,
+  "id": ids.testfail,
   "err": {
     "message": "expected 1 to equal 2",
     "stack": "Error: expected 1 to equal 2\n    at Assertion.assert (/Users/daff/Development/node/swarmling/node_modules/expect.js/expect.js:99:13)\n    CUSTOM STACK TRACE"
@@ -62,15 +90,15 @@ Testee.fail({
 });
 
 Testee.testEnd({
-  "id": 4
+  "id": ids.testfail
 });
 
 Testee.suiteEnd({
-  "id": 1
+  "id": ids.childsuite
 });
 
 Testee.suiteEnd({
-  "id": 0
+  "id": ids.suite
 });
 
 Testee.end({});
