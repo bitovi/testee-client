@@ -1,15 +1,15 @@
 'use strict';
 
-module.exports = function (grunt) {
-	grunt.initConfig({
-		pkg: grunt.file.readJSON('package.json'),
-		jshint: {
-			options: {
-				jshintrc: '.jshintrc'
-			},
-			lib: ['lib/**/*.js', 'Gruntfile.js'],
-			test: 'test/*.test.js'
-		},
+module.exports = function(grunt) {
+  grunt.initConfig({
+    pkg: grunt.file.readJSON('package.json'),
+    jshint: {
+      options: {
+        jshintrc: '.jshintrc'
+      },
+      lib: ['lib/**/*.js', 'Gruntfile.js'],
+      test: 'test/*.test.js'
+    },
     uglify: {
       dist: {
         files: {
@@ -17,12 +17,12 @@ module.exports = function (grunt) {
         }
       }
     },
-		browserify: {
-			dist: {
-				files: {
-					'dist/testee.js': ['lib/index.js']
-				}
-			},
+    browserify: {
+      dist: {
+        files: {
+          'dist/testee.js': ['lib/index.js']
+        }
+      },
       debug: {
         options: {
           bundleOptions: {
@@ -33,25 +33,27 @@ module.exports = function (grunt) {
           'dist/testee.dev.js': ['lib/index.js']
         }
       }
-		},
-		qunit: {
-			test: ['test/index.html']
-		},
-		watch: {
-			scripts: {
-				files: ['lib/**/*.js'],
-				tasks: ['build']
-			}
-		}
-	});
+    },
+    qunit: {
+      test: ['test/index.html']
+    },
+    watch: {
+      scripts: {
+        files: ['lib/**/*.js'],
+        tasks: ['build']
+      }
+    },
+    release: {}
+  });
 
-	grunt.loadNpmTasks('grunt-contrib-jshint');
-	grunt.loadNpmTasks('grunt-contrib-watch');
-	grunt.loadNpmTasks('grunt-contrib-qunit');
+  grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-contrib-qunit');
   grunt.loadNpmTasks('grunt-contrib-uglify');
-	grunt.loadNpmTasks('grunt-browserify');
+  grunt.loadNpmTasks('grunt-browserify');
+  grunt.loadNpmTasks('grunt-release');
 
-	grunt.registerTask('build', ['browserify', 'uglify']);
-	grunt.registerTask('test', ['jshint', 'build', 'qunit']);
-	grunt.registerTask('default', ['watch']);
+  grunt.registerTask('build', ['browserify', 'uglify']);
+  grunt.registerTask('test', ['jshint', 'build', 'qunit']);
+  grunt.registerTask('default', ['watch']);
 };
