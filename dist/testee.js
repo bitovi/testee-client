@@ -637,6 +637,8 @@ module.exports = function (options) {
 		end: function (data) {
 			data = _.extend({ status: 'finished' }, data);
 
+      var socket = this.socket;
+
 			if (window.__coverage__ && this.coverages) {
 				this.call('coverages', 'create', {
 					id: data.id,
@@ -645,7 +647,11 @@ module.exports = function (options) {
 				});
 			}
 
-			this.call('runs', 'patch', data.id, data);
+			this.call('runs', 'patch', data.id, data).then(function() {
+        if(typeof socket.disconnect === 'function') {
+          socket.disconnect();
+        }
+      });
 		}
 	}, options);
 };
