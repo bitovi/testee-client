@@ -21,7 +21,7 @@ When loading files asynchronously:
 ```html
 <script type="text/javascript">
 window.Testee = {
-  autoinit: false
+  autoInit: false
 }
 
 define(['testee-client', 'qunit'], function() {

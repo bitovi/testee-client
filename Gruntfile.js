@@ -15,6 +15,11 @@ module.exports = function(grunt) {
         files: {
           'dist/testee.min.js': 'dist/testee.js'
         }
+      },
+      bootstrap: {
+        files: {
+          'dist/bootstrap.min.js': 'lib/bootstrap.js'
+        }
       }
     },
     browserify: {

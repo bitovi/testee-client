@@ -116,8 +116,8 @@ _.extend(TesteeReporter.prototype, {
 	}
 });
 
-module.exports = function (win, runner) {
-	win.jasmine.getEnv().addReporter(new TesteeReporter(runner));
+module.exports = function (jasmine, runner) {
+	jasmine.getEnv().addReporter(new TesteeReporter(runner));
 };
 
 module.exports.Reporter = TesteeReporter;
@@ -249,11 +249,10 @@ TesteeReporter.prototype.diff = function(obj) {
   return result;
 };
 
-module.exports = function(win, api) {
+module.exports = function(mocha, api) {
   TesteeReporter.prototype.api = api;
-  TesteeReporter.prototype.OldReporter = win.mocha._reporter;
-  win.Mocha.reporters.Testee = TesteeReporter;
-  win.mocha.reporter(TesteeReporter);
+  TesteeReporter.prototype.OldReporter = mocha._reporter;
+  mocha.reporter(TesteeReporter);
 };
 
 module.exports.Reporter = TesteeReporter;
@@ -261,8 +260,7 @@ module.exports.Reporter = TesteeReporter;
 },{"./../guid":5,"underscore":26}],3:[function(require,module,exports){
 var guid = require('./../guid');
 
-module.exports = function (win, Runner) {
-	var QUnit = win.QUnit;
+module.exports = function (QUnit, Runner, win) {
 	var suites = []; // Contains all currently active suites (nested)
 	// Returns the id of the currently active test suite (last one pushed)
 	var suiteId = function () {
@@ -510,7 +508,7 @@ var Runner = require('./runner');
 var service = require('./service');
 
 var setupQunit = require('./adapters/qunit');
-var setupJasmineLegacy = require('./adapters/jasmine-legacy');
+var setupJasmine1 = require('./adapters/jasmine-legacy');
 var setupMocha = require('./adapters/mocha');
 
 ready(function() {
@@ -519,9 +517,46 @@ ready(function() {
 
   _.defaults(options, {
     runs: service('runs', options.socket),
+
     suites: service('suites', options.socket),
+
     tests: service('tests', options.socket),
+
     coverages: service('coverages', options.socket),
+
+    runner: function() {
+      if(!this._runner) {
+        this._runner = Runner(options);
+      }
+      return this._runner;
+    },
+
+    init: function() {
+      if (window.QUnit) {
+        this.initQUnit(window.QUnit);
+      }
+
+      if (window.jasmine && window.jasmine.version_ && window.jasmine.version_.major === 1) {
+        this.initJasmine1(window.jasmine);
+      }
+
+      if (window.mocha && window.Mocha) {
+        this.initMocha(window.mocha);
+      }
+    },
+
+    initQUnit: function(QUnit) {
+      setupQunit(QUnit, this.runner(), window);
+    },
+
+    initJasmine1: function(jasmine) {
+      setupJasmine1(jasmine, this.runner(), window);
+    },
+
+    initMocha: function(mocha) {
+      setupMocha(mocha || window.mocha, this.runner(), window);
+    },
+
     connect: new Deferred(function(resolve) {
       var done = function() {
         // We need to add a timeout because PhantomJS for some reason
@@ -539,27 +574,15 @@ ready(function() {
     })
   });
 
-  var runner = Runner(options);
-  var init = function() {
-    if (window.QUnit) {
-      setupQunit(window, runner);
-    }
-
-    if (window.jasmine && window.jasmine.version_ && window.jasmine.version_.major === 1) {
-      setupJasmineLegacy(window, runner);
-    }
-
-    if (window.mocha && window.Mocha) {
-      setupMocha(window, runner);
-    }
-  };
-
-  if(options.autoinit === false) {
-    window.Testee.init = init;
-  } else {
-    init();
+  if(options.autoInit !== false) {
+    options.init();
   }
 });
+
+// Restore original loader global variables
+if(window._restoreUMD) {
+  window._restoreUMD();
+}
 
 },{"./adapters/jasmine-legacy":1,"./adapters/mocha":2,"./adapters/qunit":3,"./docready":4,"./runner":7,"./service":8,"es6-promise":16,"underscore":26}],7:[function(require,module,exports){
 var _ = require('underscore');
