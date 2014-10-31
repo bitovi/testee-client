@@ -531,6 +531,11 @@ ready(function() {
       return this._runner;
     },
 
+    canInitialize: function() {
+      return window.QUnit || (window.jasmine && window.jasmine.version_ && window.jasmine.version_.major === 1) ||
+        (window.mocha && window.Mocha);
+    },
+
     init: function() {
       if (window.QUnit) {
         this.initQUnit(window.QUnit);
@@ -574,7 +579,7 @@ ready(function() {
     })
   });
 
-  if(options.autoInit !== false) {
+  if(options.canInitialize()) {
     options.init();
   }
 });
