@@ -24,8 +24,8 @@
   },
   "homepage": "https://github.com/bitovi/testee-client",
   "dependencies": {
-    "MD5": "^1.2.1",
     "es6-promise": "^1.0.0",
+    "md5": "^2.0.0",
     "underscore": "^1.6.0"
   },
   "devDependencies": {
