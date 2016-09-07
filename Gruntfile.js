@@ -29,7 +29,7 @@ module.exports = function(grunt) {
         }
       },
       debug: {
-        options: {
+        browserifyOptions: {
           bundleOptions: {
             debug: true
           }
