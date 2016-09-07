@@ -1,6 +1,6 @@
 {
   "name": "testee-client",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Testee testing framework client adapters",
   "main": "dist/testee.js",
   "scripts": {
