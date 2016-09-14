@@ -76,7 +76,7 @@ ready(function() {
     connect: new Promise(function(resolve) {
       var done = function() {
         // We need to add a timeout because PhantomJS for some reason
-        // sends the runs::create event too soon
+        // sends the api/runs::create event too soon
         _.delay(function() {
           resolve(options.socket);
         }, 250);

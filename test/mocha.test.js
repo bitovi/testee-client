@@ -5,7 +5,7 @@
 
   var expected = [
     {
-      "name": "runs::create",
+      "name": "api/runs::create",
       "data": {
         "status": "running",
         "environment": navigator.userAgent,
@@ -14,7 +14,7 @@
       }
     },
     {
-      "name": "suites::create",
+      "name": "api/suites::create",
       "data": {
         "status": "running",
         "title": "",
@@ -24,7 +24,7 @@
       }
     },
     {
-      "name": "suites::create",
+      "name": "api/suites::create",
       "data": {
         "status": "running",
         "title": "Test module",
@@ -34,7 +34,7 @@
       }
     },
     {
-      "name": "suites::create",
+      "name": "api/suites::create",
       "data": {
         "status": "running",
         "title": "It does something",
@@ -44,7 +44,7 @@
       }
     },
     {
-      "name": "tests::create",
+      "name": "api/tests::create",
       "data": {
         "title": "Skipped test",
         "sync": true,
@@ -56,7 +56,7 @@
       }
     },
     {
-      "name": "tests::create",
+      "name": "api/tests::create",
       "data": {
         "title": "Fails",
         "async": 0,
@@ -68,7 +68,7 @@
       }
     },
     {
-      "name": "tests::patch",
+      "name": "api/tests::patch",
       "data": {
         "status": "failed",
         "state": "failed",
@@ -78,13 +78,13 @@
       }
     },
     {
-      "name": "suites::patch",
+      "name": "api/suites::patch",
       "data": {
         "status": "finished"
       }
     },
     {
-      "name": "suites::create",
+      "name": "api/suites::create",
       "data": {
         "status": "running",
         "title": "Some other suite",
@@ -94,7 +94,7 @@
       }
     },
     {
-      "name": "suites::create",
+      "name": "api/suites::create",
       "data": {
         "status": "running",
         "title": "Nested suite",
@@ -104,7 +104,7 @@
       }
     },
     {
-      "name": "tests::create",
+      "name": "api/tests::create",
       "data": {
         "title": "Test ran!",
         "async": 0,
@@ -116,7 +116,7 @@
       }
     },
     {
-      "name": "tests::patch",
+      "name": "api/tests::patch",
       "data": {
         "status": "passed",
         "duration": 0,
@@ -124,7 +124,7 @@
       }
     },
     {
-      "name": "tests::create",
+      "name": "api/tests::create",
       "data": {
         "title": "Runs async",
         "async": 1,
@@ -136,38 +136,38 @@
       }
     },
     {
-      "name": "tests::patch",
+      "name": "api/tests::patch",
       "data": {
         "status": "passed",
         "state": "passed"
       }
     },
     {
-      "name": "suites::patch",
+      "name": "api/suites::patch",
       "data": {
         "status": "finished"
       }
     },
     {
-      "name": "suites::patch",
+      "name": "api/suites::patch",
       "data": {
         "status": "finished"
       }
     },
     {
-      "name": "suites::patch",
+      "name": "api/suites::patch",
       "data": {
         "status": "finished"
       }
     },
     {
-      "name": "suites::patch",
+      "name": "api/suites::patch",
       "data": {
         "status": "finished"
       }
     },
     {
-      "name": "coverages::create",
+      "name": "api/coverages::create",
       "data": {
         coverage: {
           "test": "Mocha coverage"
@@ -175,7 +175,7 @@
       }
     },
     {
-      "name": "runs::patch",
+      "name": "api/runs::patch",
       "data": {
         "status": "finished",
         "total": 4,

@@ -44,23 +44,6 @@ window.walkExpected = function(expected, socket) {
 	};
 };
 
-window.logSocketData = function(socket) {
-	var old = socket.emit;
-	var messages = [];
-	socket.emit = function(name, data, other) {
-    console.log(arguments);
-		messages.push({
-			name: name,
-			data: typeof data === 'string' ? other : data
-		});
-		return old.apply(this, arguments);
-	};
-
-	socket.on('runs::patch', function() {
-		console.log(JSON.stringify(messages, null, '  '));
-	});
-};
-
 window.getTesteeOptions = function(name) {
   var options = window.Testee[name] = {
     socket: new window.EventEmitter()

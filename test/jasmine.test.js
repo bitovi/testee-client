@@ -5,7 +5,7 @@
 
 	var expected = [
 		{
-			"name": "runs::create",
+			"name": "api/runs::create",
 			"data": {
 				"status": "running",
 				"environment": navigator.userAgent,
@@ -14,7 +14,7 @@
 			}
 		},
 		{
-			"name": "suites::create",
+			"name": "api/suites::create",
 			"data": {
 				"status": "running",
 				"title": "Test module",
@@ -23,7 +23,7 @@
 			}
 		},
 		{
-			"name": "suites::create",
+			"name": "api/suites::create",
 			"data": {
 				"status": "running",
 				"title": "It does something",
@@ -31,21 +31,21 @@
 			}
 		},
 		{
-			"name": "tests::create",
+			"name": "api/tests::create",
 			"data": {
 				"title": "Skipped test",
         "file": /jasmine\/jasmine\.html/
 			}
 		},
 		{
-			"name": "tests::create",
+			"name": "api/tests::create",
 			"data": {
 				"title": "Fails",
         "file": /jasmine\/jasmine\.html/
 			}
 		},
 		{
-			"name": "tests::patch",
+			"name": "api/tests::patch",
 			"data": {
 				"status": "failed",
 				"err": {
@@ -54,13 +54,13 @@
 			}
 		},
 		{
-			"name": "suites::patch",
+			"name": "api/suites::patch",
 			"data": {
 				"status": "finished"
 			}
 		},
 		{
-			"name": "suites::create",
+			"name": "api/suites::create",
 			"data": {
 				"status": "running",
 				"title": "Some other suite",
@@ -68,7 +68,7 @@
 			}
 		},
 		{
-			"name": "suites::create",
+			"name": "api/suites::create",
 			"data": {
 				"status": "running",
 				"title": "Nested suite",
@@ -76,37 +76,37 @@
 			}
 		},
 		{
-			"name": "tests::create",
+			"name": "api/tests::create",
 			"data": {
 				"title": "Test ran!"
 			}
 		},
 		{
-			"name": "tests::patch",
+			"name": "api/tests::patch",
 			"data": {
 				"status": "passed"
 			}
 		},
 		{
-			"name": "suites::patch",
+			"name": "api/suites::patch",
 			"data": {
 				"status": "finished"
 			}
 		},
 		{
-			"name": "suites::patch",
+			"name": "api/suites::patch",
 			"data": {
 				"status": "finished"
 			}
 		},
 		{
-			"name": "suites::patch",
+			"name": "api/suites::patch",
 			"data": {
 				"status": "finished"
 			}
 		},
     {
-      "name": "coverages::create",
+      "name": "api/coverages::create",
       "data": {
         coverage: {
           "test": "Jasmine coverage"
@@ -114,7 +114,7 @@
       }
     },
 		{
-			"name": "runs::patch",
+			"name": "api/runs::patch",
 			"data": {
 				"failed": 1,
 				"passed": 1,

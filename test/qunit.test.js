@@ -5,7 +5,7 @@
 
 	var expected = [
 		{
-			"name": "runs::create",
+			"name": "api/runs::create",
 			"data": {
 				"status": "running",
 				"environment": navigator.userAgent,
@@ -14,7 +14,7 @@
 			}
 		},
 		{
-			"name": "suites::create",
+			"name": "api/suites::create",
 			"data": {
 				"status": "running",
 				"title": "QUnit example",
@@ -23,7 +23,7 @@
 			}
     },
 		{
-			"name": "suites::create",
+			"name": "api/suites::create",
 			"data": {
 				"status": "running",
 				"title": "Test module",
@@ -31,7 +31,7 @@
 			}
 		},
 		{
-			"name": "suites::create",
+			"name": "api/suites::create",
 			"data": {
 				"status": "running",
 				"title": "A failing test",
@@ -39,14 +39,14 @@
 			}
 		},
 		{
-			"name": "tests::create",
+			"name": "api/tests::create",
 			"data": {
 				"title": "This test should fail",
         "file": /qunit\/qunit\.html/
 			}
 		},
 		{
-			"name": "tests::patch",
+			"name": "api/tests::patch",
 			"data": {
 				"status": "failed",
 				"err": {
@@ -55,13 +55,13 @@
 			}
 		},
 		{
-			"name": "suites::patch",
+			"name": "api/suites::patch",
 			"data": {
 				"status": "finished"
 			}
 		},
 		{
-			"name": "suites::create",
+			"name": "api/suites::create",
 			"data": {
 				"status": "running",
 				"title": "It does something",
@@ -69,26 +69,26 @@
 			}
 		},
 		{
-			"name": "tests::create",
+			"name": "api/tests::create",
 			"data": {
 				"title": "Test ran!",
         "file": /qunit\/qunit\.html/
 			}
 		},
 		{
-			"name": "tests::patch",
+			"name": "api/tests::patch",
 			"data": {
 				"status": "passed"
 			}
 		},
 		{
-			"name": "suites::patch",
+			"name": "api/suites::patch",
 			"data": {
 				"status": "finished"
 			}
 		},
 		{
-			"name": "suites::patch",
+			"name": "api/suites::patch",
 			"data": {
 				"status": "finished",
 				"failed": 1,
@@ -96,7 +96,7 @@
 			}
 		},
 		{
-			"name": "suites::create",
+			"name": "api/suites::create",
 			"data": {
 				"status": "running",
 				"title": "Other module",
@@ -104,7 +104,7 @@
 			}
 		},
 		{
-			"name": "suites::create",
+			"name": "api/suites::create",
 			"data": {
         "status": "running",
         "title": "It does something async",
@@ -112,26 +112,26 @@
       }
 		},
 		{
-			"name": "tests::create",
+			"name": "api/tests::create",
 			"data": {
 				"title": "Async test ran!",
         "file": /qunit\/qunit\.html/
 			}
 		},
 		{
-			"name": "tests::patch",
+			"name": "api/tests::patch",
 			"data": {
 				"status": "passed"
 			}
 		},
 		{
-			"name": "suites::patch",
+			"name": "api/suites::patch",
 			"data": {
 				"status": "finished"
 			}
 		},
 		{
-			"name": "suites::patch",
+			"name": "api/suites::patch",
 			"data": {
 				"status": "finished",
 				"failed": 0,
@@ -139,10 +139,10 @@
 			}
 		},
     {
-      "name": "suites::patch"
+      "name": "api/suites::patch"
     },
     {
-      "name": "coverages::create",
+      "name": "api/coverages::create",
       "data": {
         coverage: {
           "test": "Qunit coverage"
@@ -150,7 +150,7 @@
       }
     },
 		{
-			"name": "runs::patch",
+			"name": "api/runs::patch",
 			"data": {
 				"status": "finished",
 				"failed": 1,
