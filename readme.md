@@ -1,5 +1,7 @@
 # Testee client adapters
 
+[![Build Status](https://travis-ci.org/bitovi/testee-client.svg?branch=master)](https://travis-ci.org/bitovi/testee-client)
+
 Testee client side adapters for Mocha, QUnit and Jasmine that convert test results into Feathers service socket calls (`runs`, `suites` and `tests`).
 
 ## Initializing options
