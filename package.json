@@ -51,6 +51,8 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "core-js": "^2.4.1",
+    "feathers": "^2.0.1",
+    "feathers-socketio": "^1.4.1",
     "grunt": "^1.0.1",
     "grunt-cli": "^1.2.0",
     "grunt-contrib-qunit": "^1.2.0",
