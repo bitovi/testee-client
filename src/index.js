@@ -5,10 +5,11 @@ var _ = {
     delay: require('lodash/delay')
 };
 var io = require('socket.io-client/socket.io');
+var feathers = require('feathers/client');
+var socketio = require('feathers-socketio/client');
+
 var ready = require('./docready');
 var Runner = require('./runner');
-var service = require('./service');
-
 var setupQunit = require('./adapters/qunit');
 var setupJasmine1 = require('./adapters/jasmine-legacy');
 var setupJasmine = require('./adapters/jasmine');
@@ -16,16 +17,20 @@ var setupMocha = require('./adapters/mocha');
 
 ready(function() {
   var options = window.Testee = window.Testee || {};
-  options.socket = options.socket || io();
+
+  if(!options.app) {
+    options.socket = options.socket || io();
+    options.app = feathers().configure(socketio(options.socket));
+  }
 
   _.defaults(options, {
-    runs: service('api/runs', options.socket),
+    runs: options.app.service('api/runs'),
 
-    suites: service('api/suites', options.socket),
+    suites: options.app.service('api/suites'),
 
-    tests: service('api/tests', options.socket),
+    tests: options.app.service('api/tests'),
 
-    coverages: service('api/coverages', options.socket),
+    coverages: options.app.service('api/coverages'),
 
     runner: function() {
       if(!this._runner) {
