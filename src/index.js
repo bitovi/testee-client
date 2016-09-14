@@ -1,3 +1,5 @@
+require('core-js/client/core');
+
 var _ = {
     defaults: require('lodash/defaults'),
     delay: require('lodash/delay')

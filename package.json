@@ -35,9 +35,7 @@
     "meta": {
       "core-js/client/core": {
         "format": "amd"
-      }
-    },
-    "meta": {
+      },
       "socket.io-client/socket.io": {
         "format": "amd"
       }
