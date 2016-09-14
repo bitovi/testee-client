@@ -29,8 +29,10 @@ module.exports = function (QUnit, Runner, win) {
 			time: new Date().getTime()
 		});
 
+		var title = titleEl ? titleEl.children.length ? titleEl.children[0].innerHTML : titleEl.innerHTML : '';
+
 		Runner.suite({
-			title: titleEl ? titleEl.innerHTML : '',
+			title: title,
 			root: true,
 			id: suite,
       parent: runId
