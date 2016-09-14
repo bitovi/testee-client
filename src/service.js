@@ -1,4 +1,4 @@
-var _ = require('underscore');
+var _ = { each: require('lodash/each') };
 var stripSlashes = function (name) {
 	return name.replace(/^\/|\/$/g, '');
 };

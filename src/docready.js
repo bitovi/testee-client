@@ -1,7 +1,5 @@
-"use strict";
+var domReadyCallback = function() {};
 
-var domReadyCallback = function() {
-};
 // Define a local copy of $
 var $ = function(callback) {
   readyBound = false;

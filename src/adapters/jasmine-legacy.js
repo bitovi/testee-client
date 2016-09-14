@@ -1,4 +1,7 @@
-var _ = require('underscore');
+var _ = {
+	extend: require('lodash/assign'),
+	noop: require('lodash/noop')
+};
 var guid = require('./../guid');
 
 var TesteeReporter = function (runner) {

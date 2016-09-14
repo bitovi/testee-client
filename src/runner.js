@@ -1,10 +1,9 @@
-var _ = require('underscore');
-var Deferred = require('es6-promise').Promise;
+var _ = { toArray: require('lodash/toArray') };
 
 module.exports = function (options) {
   var file = { file: window.location.toString() };
 
-	return _.extend({
+	return Object.assign({
     call: function(path, method) {
       var args = _.toArray(arguments).slice(2);
       var service = this[path];
@@ -13,7 +12,7 @@ module.exports = function (options) {
       // Chain this service call to make sure it only runs
       // after all previous returned with an ACK
       this.connect = this.connect.then(function() {
-        return new Deferred(function(resolve, reject) {
+        return new Promise(function(resolve, reject) {
           args.push({});
           args.push(function(error, data) {
             if(error) {
@@ -30,48 +29,48 @@ module.exports = function (options) {
     },
 
 		start: function (data) {
-			data = _.extend({
+			data = Object.assign({
         status: 'running'
       }, file, data);
       this.call('runs', 'create', data);
 		},
 
 		suite: function (data) {
-			data = _.extend({
+			data = Object.assign({
         status: 'running'
       }, file, data);
 			this.call('suites', 'create', data);
 		},
 
 		test: function (data) {
-      data = _.extend({}, file, data);
+      data = Object.assign({}, file, data);
 			this.call('tests', 'create', data);
 		},
 
 		pending: function (data) {
-      data = _.extend({ status: 'pending' }, file, data);
+      data = Object.assign({ status: 'pending' }, file, data);
 			this.call('tests', 'create', data);
 		},
 
 		pass: function (data) {
-			data = _.extend({ status: 'passed' }, data);
+			data = Object.assign({ status: 'passed' }, data);
 			this.call('tests', 'patch', data.id, data);
 		},
 
 		fail: function (data) {
-			data = _.extend({ status: 'failed' }, data);
+			data = Object.assign({ status: 'failed' }, data);
 			this.call('tests', 'patch', data.id, data);
 		},
 
 		testEnd: function () {},
 
 		suiteEnd: function (data) {
-			data = _.extend({ status: 'finished' }, data);
+			data = Object.assign({ status: 'finished' }, data);
 			this.call('suites', 'patch', data.id, data);
 		},
 
 		end: function (data) {
-			data = _.extend({ status: 'finished' }, data);
+			data = Object.assign({ status: 'finished' }, data);
 
       var socket = this.socket;
 

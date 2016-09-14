@@ -2,7 +2,7 @@
     "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-  <link rel="stylesheet" href="../../bower_components/qunit/qunit/qunit.css" type="text/css" media="screen" />
+  <link rel="stylesheet" href="../../node_modules/qunitjs/qunit/qunit.css" type="text/css" media="screen" />
 </head>
 <body>
   <h1 id="qunit-header">QUnit example</h1>
@@ -11,14 +11,14 @@
   <h2 id="qunit-userAgent"></h2>
   <ol id="qunit-tests"></ol>
   <div id="qunit-fixture">test markup, will be hidden</div>
-
-  <script type="text/javascript" src="../../bower_components/qunit/qunit/qunit.js"></script>
+  
+  <script type="text/javascript" src="../../node_modules/qunitjs/qunit/qunit.js"></script>
   <script type="text/javascript">
     window.Testee = window.top.Testee.QUnit;
     window.__coverage__ = { test: 'Qunit coverage' };
   </script>
 
-  <script type="text/javascript" src="../../dist/testee.dev.js"></script>
+  <script type="text/javascript" src="../../dist/testee.js"></script>
   <script type="text/javascript" src="test.js"></script>
 </body>
 </html>

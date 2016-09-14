@@ -1,6 +1,10 @@
-var _ = require('underscore');
-var Deferred = require('es6-promise').Promise;
+require('core-js/client/core');
 
+var _ = {
+    defaults: require('lodash/defaults'),
+    delay: require('lodash/delay')
+};
+var io = require('socket.io-client');
 var ready = require('./docready');
 var Runner = require('./runner');
 var service = require('./service');
@@ -69,7 +73,7 @@ ready(function() {
       setupMocha(mocha || window.mocha, this.runner(), window);
     },
 
-    connect: new Deferred(function(resolve) {
+    connect: new Promise(function(resolve) {
       var done = function() {
         // We need to add a timeout because PhantomJS for some reason
         // sends the runs::create event too soon
@@ -90,8 +94,3 @@ ready(function() {
     options.init();
   }
 });
-
-// Restore original loader global variables
-if(window._restoreUMD) {
-  window._restoreUMD();
-}

@@ -1,4 +1,11 @@
-var _ = require('underscore');
+var _ = {
+    extend: require('lodash/assign'),
+    noop: require('lodash/noop'),
+    each: require('lodash/each'),
+    bind: require('lodash/bind'),
+    indexOf: require('lodash/indexOf'),
+    clone: require('lodash/clone')
+};
 var guid = require('./../guid');
 
 function TesteeReporter(runner) {
