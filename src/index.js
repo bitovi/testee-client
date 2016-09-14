@@ -1,10 +1,8 @@
-require('core-js/client/core');
-
 var _ = {
     defaults: require('lodash/defaults'),
     delay: require('lodash/delay')
 };
-var io = require('socket.io-client');
+var io = require('socket.io-client/socket.io');
 var ready = require('./docready');
 var Runner = require('./runner');
 var service = require('./service');
@@ -19,13 +17,13 @@ ready(function() {
   options.socket = options.socket || io();
 
   _.defaults(options, {
-    runs: service('runs', options.socket),
+    runs: service('api/runs', options.socket),
 
-    suites: service('suites', options.socket),
+    suites: service('api/suites', options.socket),
 
-    tests: service('tests', options.socket),
+    tests: service('api/tests', options.socket),
 
-    coverages: service('coverages', options.socket),
+    coverages: service('api/coverages', options.socket),
 
     runner: function() {
       if(!this._runner) {

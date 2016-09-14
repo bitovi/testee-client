@@ -2,7 +2,7 @@
   "name": "testee-client",
   "version": "0.4.0-pre.1",
   "description": "Testee testing framework client adapters",
-  "main": "dist/testee.js",
+  "main": "src/index",
   "scripts": {
     "jshint": "jshint --config .jshintrc test/*.js src/*.js",
     "build": "rm -rf dist/ && node build.js",
@@ -34,6 +34,11 @@
     },
     "meta": {
       "core-js/client/core": {
+        "format": "amd"
+      }
+    },
+    "meta": {
+      "socket.io-client/socket.io": {
         "format": "amd"
       }
     }
