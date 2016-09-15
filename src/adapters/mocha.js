@@ -1,10 +1,10 @@
 var _ = {
-    extend: require('lodash/assign'),
-    noop: require('lodash/noop'),
-    each: require('lodash/each'),
-    bind: require('lodash/bind'),
-    indexOf: require('lodash/indexOf'),
-    clone: require('lodash/clone')
+  extend: require('lodash/assign'),
+  noop: require('lodash/noop'),
+  each: require('lodash/each'),
+  bind: require('lodash/bind'),
+  indexOf: require('lodash/indexOf'),
+  clone: require('lodash/clone')
 };
 var guid = require('./../guid');
 
@@ -63,7 +63,7 @@ function TesteeReporter(runner) {
 
   pipe('suite', function(data) {
     var diff = self.diff(data);
-    if(data.root) {
+    if (data.root) {
       diff.parent = self.runId;
     }
 
@@ -95,12 +95,12 @@ TesteeReporter.prototype.objectify = function(data) {
 
   _.each(data, function(value, key) {
     var isPrivate = key.indexOf('_') === 0 || key.indexOf('$') === 0;
-    if(typeof value === 'object' && !isPrivate) {
+    if (typeof value === 'object' && !isPrivate) {
       var idx = _.indexOf(self.ids, value);
-      if(!!~idx) {
+      if (!!~idx) {
         result[key] = self.uuids[idx];
       }
-    } else if(typeof value !== 'function' && !isPrivate && value !== undefined) {
+    } else if (typeof value !== 'function' && !isPrivate && value !== undefined) {
       result[key] = value;
     }
   });
@@ -113,13 +113,13 @@ TesteeReporter.prototype.diff = function(obj) {
   var result = {};
   var idx = _.indexOf(self.ids, obj);
 
-  if(!~idx) {
+  if (!~idx) {
     idx = self.ids.push(obj) - 1;
     self.uuids[idx] = guid();
     result = _.clone(current || {});
   } else {
     _.each(current, function(value, key) {
-      if(self.last[idx][key] !== value) {
+      if (self.last[idx][key] !== value) {
         result[key] = value;
       }
     });

@@ -1,8 +1,8 @@
 require('core-js/client/core');
 
 var _ = {
-    defaults: require('lodash/defaults'),
-    delay: require('lodash/delay')
+  defaults: require('lodash/defaults'),
+  delay: require('lodash/delay')
 };
 var io = require('socket.io-client/socket.io');
 var feathers = require('feathers/client');
@@ -18,7 +18,7 @@ var setupMocha = require('./adapters/mocha');
 ready(function() {
   var options = window.Testee = window.Testee || {};
 
-  if(!options.app) {
+  if (!options.app) {
     options.socket = options.socket || io();
     options.app = feathers().configure(socketio(options.socket));
   }
@@ -33,7 +33,7 @@ ready(function() {
     coverages: options.app.service('api/coverages'),
 
     runner: function() {
-      if(!this._runner) {
+      if (!this._runner) {
         this._runner = Runner(options);
       }
       return this._runner;
@@ -41,7 +41,7 @@ ready(function() {
 
     canInitialize: function() {
       return window.QUnit || (window.jasmine && window.jasmine.version_ && window.jasmine.version_.major === 1) ||
-        (window.jasmine && window.jasmine.version && window.jasmine.version.split('.')[0] === '2')  || (window.mocha && window.Mocha);
+        (window.jasmine && window.jasmine.version && window.jasmine.version.split('.')[0] === '2') || (window.mocha && window.Mocha);
     },
 
     init: function() {
@@ -87,7 +87,7 @@ ready(function() {
         }, 250);
       };
 
-      if(!options.socket.connected) {
+      if (!options.socket.connected) {
         options.socket.on('connect', done);
       } else {
         done();
@@ -95,7 +95,7 @@ ready(function() {
     })
   });
 
-  if(options.canInitialize()) {
+  if (options.canInitialize()) {
     options.init();
   }
 });

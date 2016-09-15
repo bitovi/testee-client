@@ -1,24 +1,24 @@
 var guid = require('./../guid');
 
-module.exports = function (QUnit, Runner, win) {
+module.exports = function(QUnit, Runner, win) {
 	var suites = []; // Contains all currently active suites (nested)
 	// Returns the id of the currently active test suite (last one pushed)
-	var suiteId = function () {
+	var suiteId = function() {
 		return suites[suites.length - 1];
 	};
-  var endSuite = function () {
-    Runner.suiteEnd({
-      id: suiteId()
-    });
-    suites.pop();
-  };
+	var endSuite = function() {
+		Runner.suiteEnd({
+			id: suiteId()
+		});
+		suites.pop();
+	};
 	var runId = guid();
 
 	// TODO async tests
 	// var oldstart = win.start;
 	// var oldstop = win.stop;
 
-	QUnit.begin(function () {
+	QUnit.begin(function() {
 		var titleEl = win.document.getElementsByTagName('title')[0] || document.getElementsByTagName('h1')[0];
 		var suite = guid();
 
@@ -35,13 +35,13 @@ module.exports = function (QUnit, Runner, win) {
 			title: title,
 			root: true,
 			id: suite,
-      parent: runId
+			parent: runId
 		});
 
 		suites.push(suite);
 	});
 
-	QUnit.moduleStart(function (data) {
+	QUnit.moduleStart(function(data) {
 		var id = guid();
 
 		Runner.suite({
@@ -52,7 +52,7 @@ module.exports = function (QUnit, Runner, win) {
 		suites.push(id);
 	});
 
-	QUnit.moduleDone(function (data) {
+	QUnit.moduleDone(function(data) {
 		Runner.suiteEnd({
 			failed: data.failed,
 			total: data.total,
@@ -61,7 +61,7 @@ module.exports = function (QUnit, Runner, win) {
 		suites.pop();
 	});
 
-	QUnit.testStart(function (data) {
+	QUnit.testStart(function(data) {
 		var id = guid();
 
 		Runner.suite({
@@ -74,7 +74,7 @@ module.exports = function (QUnit, Runner, win) {
 
 	QUnit.testDone(endSuite);
 
-	QUnit.log(function (data) {
+	QUnit.log(function(data) {
 		var testId = guid();
 		var errorMessage = '';
 
@@ -108,9 +108,9 @@ module.exports = function (QUnit, Runner, win) {
 		});
 	});
 
-	QUnit.done(function (data) {
+	QUnit.done(function(data) {
 		data.id = runId;
-    endSuite();
+		endSuite();
 		Runner.end(data);
 	});
 

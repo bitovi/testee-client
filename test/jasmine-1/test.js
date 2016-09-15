@@ -1,6 +1,6 @@
-describe('Test module', function () {
+describe('Test module', function() {
 
-	describe('It does something', function () {
+	describe('It does something', function() {
 		xit('Skipped test', function() {
 			expect(false).toBeTruthy();
 		});
@@ -12,7 +12,7 @@ describe('Test module', function () {
 
 	describe('Some other suite', function() {
 		describe('Nested suite', function() {
-			it('Test ran!', function () {
+			it('Test ran!', function() {
 				expect(true).toBeTruthy();
 			});
 		});

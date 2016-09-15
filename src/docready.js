@@ -4,7 +4,7 @@ var domReadyCallback = function() {};
 var $ = function(callback) {
   readyBound = false;
   $.isReady = false;
-  if(typeof callback === "function") {
+  if (typeof callback === "function") {
     domReadyCallback = callback;
   }
   bindReady();
@@ -15,7 +15,7 @@ var doc = window.document;
 var readyBound = false;
 // The ready event handler
 var DOMContentLoaded = function() {
-  if(doc.addEventListener) {
+  if (doc.addEventListener) {
     doc.removeEventListener("DOMContentLoaded", DOMContentLoaded, false);
   } else {
     // we're here because readyState !== "loading" in oldIE
@@ -28,9 +28,9 @@ var DOMContentLoaded = function() {
 // Handle when the DOM is ready
 var domReady = function() {
   // Make sure that the DOM is not already loaded
-  if(!$.isReady) {
+  if (!$.isReady) {
     // Make sure body exists, at least, in case IE gets a little overzealous (ticket #5443).
-    if(!doc.body) {
+    if (!doc.body) {
       return setTimeout(domReady, 1);
     }
     // Remember that the DOM is ready
@@ -44,25 +44,25 @@ var domReady = function() {
 var bindReady = function() {
   var toplevel = false;
 
-  if(readyBound) {
+  if (readyBound) {
     return;
   }
   readyBound = true;
 
   // Catch cases where $ is called after the
   // browser event has already occurred.
-  if(doc.readyState !== "loading") {
+  if (doc.readyState !== "loading") {
     domReady();
   }
 
   // Mozilla, Opera and webkit nightlies currently support this event
-  if(doc.addEventListener) {
+  if (doc.addEventListener) {
     // Use the handy event callback
     doc.addEventListener("DOMContentLoaded", DOMContentLoaded, false);
     // A fallback to window.onload, that will always work
     window.addEventListener("load", DOMContentLoaded, false);
     // If IE event model is used
-  } else if(doc.attachEvent) {
+  } else if (doc.attachEvent) {
     // ensure firing before onload,
     // maybe late but safe also for iframes
     doc.attachEvent("onreadystatechange", DOMContentLoaded);
@@ -72,9 +72,8 @@ var bindReady = function() {
     // continually check to see if the document is ready
     try {
       toplevel = window.frameElement == null;
-    } catch(e) {
-    }
-    if(doc.documentElement.doScroll && toplevel) {
+    } catch (e) {}
+    if (doc.documentElement.doScroll && toplevel) {
       doScrollCheck();
     }
   }
@@ -82,14 +81,14 @@ var bindReady = function() {
 
 // The DOM ready check for Internet Explorer
 var doScrollCheck = function() {
-  if($.isReady) {
+  if ($.isReady) {
     return;
   }
   try {
     // If IE is used, use the trick by Diego Perini
     // http://javascript.nwbox.com/IEContentLoaded/
     doc.documentElement.doScroll("left");
-  } catch(error) {
+  } catch (error) {
     setTimeout(doScrollCheck, 1);
     return;
   }

@@ -4,7 +4,7 @@ var _ = {
 };
 var guid = require('./../guid');
 
-var TesteeReporter = function (runner) {
+var TesteeReporter = function(runner) {
 	this.runner = runner;
 	this.suites = {};
 	this.specs = {};
@@ -16,14 +16,14 @@ _.extend(TesteeReporter.prototype, {
 	log: _.noop,
 
 	id: function(obj, id) {
-		if(obj[id]) {
+		if (obj[id]) {
 			return obj[id];
 		}
 
 		return (obj[id] = guid());
 	},
 
-	reportRunnerStarting: function () {
+	reportRunnerStarting: function() {
 		var id = this.runId = guid();
 		this.runner.start({
 			id: id,
@@ -33,7 +33,7 @@ _.extend(TesteeReporter.prototype, {
 		});
 	},
 
-	reportRunnerResults: function () {
+	reportRunnerResults: function() {
 		this.runner.end({
 			id: this.runId,
 			failed: this.failed,
@@ -42,7 +42,7 @@ _.extend(TesteeReporter.prototype, {
 		});
 	},
 
-	reportSpecResults: function (spec) {
+	reportSpecResults: function(spec) {
 		if (spec.results_.failedCount) {
 			var message = spec.results_.items_[0].message;
 			var stack = spec.results_.items_[0].trace.stack;
@@ -69,7 +69,7 @@ _.extend(TesteeReporter.prototype, {
 		}
 	},
 
-	startSuite: function (suite) {
+	startSuite: function(suite) {
 		if (suite.parentSuite !== null) {
 			if (!suite.parentSuite.started) {
 				this.startSuite(suite.parentSuite);
@@ -87,14 +87,14 @@ _.extend(TesteeReporter.prototype, {
 				title: suite.description,
 				root: true,
 				id: this.id(this.suites, suite.id),
-        parent: this.runId
+				parent: this.runId
 			});
 		}
 
 		suite.started = true;
 	},
 
-	reportSpecStarting: function (spec) {
+	reportSpecStarting: function(spec) {
 		if (!spec.suite.started) {
 			this.startSuite(spec.suite);
 		}
@@ -109,7 +109,7 @@ _.extend(TesteeReporter.prototype, {
 		});
 	},
 
-	reportSuiteResults: function (suite) {
+	reportSuiteResults: function(suite) {
 		if (suite.started) {
 			this.runner.suiteEnd({
 				id: this.id(this.suites, suite.id)
@@ -118,7 +118,7 @@ _.extend(TesteeReporter.prototype, {
 	}
 });
 
-module.exports = function (jasmine, runner) {
+module.exports = function(jasmine, runner) {
 	jasmine.getEnv().addReporter(new TesteeReporter(runner));
 };
 
