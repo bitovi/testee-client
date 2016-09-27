@@ -1,5 +1,4 @@
 (function(window, undefined) {
-	var options = window.getTesteeOptions('QUnit');
 
 	module('QUnit adapter test');
 
@@ -138,15 +137,15 @@
 		}
 	}];
 
-	test('runs the QUnit test and writes expected data to socket', function() {
+	window.getTesteeOptions('QUnit', expected);
+
+	test('runs the QUnit test and writes expected data', function() {
 		// Insert the iframe with the test
 		var iframe = document.createElement('iframe');
-		var walker = window.walkExpected(expected, options.socket);
 
 		iframe.src = 'qunit/qunit.html';
 		document.getElementById('qunit-fixture').appendChild(iframe);
 
 		stop();
-		walker();
 	});
 })(this);

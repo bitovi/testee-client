@@ -1,5 +1,4 @@
 (function(window, undefined) {
-  var options = window.getTesteeOptions('Mocha');
 
   module('Mocha adapter test');
 
@@ -165,15 +164,15 @@
     }
   }];
 
-  test('runs the Mocha test and writes expected data to socket', function() {
+  window.getTesteeOptions('Mocha', expected);
+
+  test('runs the Mocha test and writes expected data', function() {
     // Insert the iframe with the test
     var iframe = document.createElement('iframe');
-    var walker = window.walkExpected(expected, options.socket);
 
     iframe.src = 'mocha/mocha.html';
     document.getElementById('qunit-fixture').appendChild(iframe);
 
     stop();
-    walker();
   });
 })(this);

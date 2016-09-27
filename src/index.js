@@ -4,8 +4,10 @@ var _ = {
   defaults: require('lodash/defaults'),
   delay: require('lodash/delay')
 };
-var io = require('socket.io-client/socket.io');
 var feathers = require('feathers/client');
+var rest = require('feathers-rest/client');
+var superagent = require('superagent/lib/client');
+var io = require('socket.io-client/socket.io');
 var socketio = require('feathers-socketio/client');
 
 var ready = require('./docready');
@@ -17,10 +19,17 @@ var setupMocha = require('./adapters/mocha');
 
 ready(function() {
   var options = window.Testee = window.Testee || {};
+  options.baseURL = options.baseURL || window.location.protocol + '//' + window.location.host;
 
-  if (!options.app) {
-    options.socket = options.socket || io();
-    options.app = feathers().configure(socketio(options.socket));
+  if(!options.app) {
+    if(options.provider && options.provider.type === 'rest') {
+
+      var restService = rest(options.baseURL).superagent(superagent);
+      options.app = feathers().configure(restService);
+    } else {
+      options.socket = options.socket || io(options.baseURL);
+      options.app = feathers().configure(socketio(options.socket));
+    }
   }
 
   _.defaults(options, {
@@ -87,7 +96,7 @@ ready(function() {
         }, 250);
       };
 
-      if (!options.socket.connected) {
+      if (options.socket && !options.socket.connected) {
         options.socket.on('connect', done);
       } else {
         done();

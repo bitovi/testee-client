@@ -1,5 +1,4 @@
 (function(window, undefined) {
-	var options = window.getTesteeOptions('Jasmine');
 
 	module('Jasmine 2.x adapter test');
 
@@ -107,15 +106,15 @@
 		}
 	}];
 
-	test('runs the Jasmine test and writes expected data to socket', function() {
+	window.getTesteeOptions('Jasmine', expected);
+
+	test('runs the Jasmine test and writes expected data', function() {
 		// Insert the iframe with the test
 		var iframe = document.createElement('iframe');
-		var walker = window.walkExpected(expected, options.socket);
 
 		iframe.src = 'jasmine/jasmine.html';
 		document.getElementById('qunit-fixture').appendChild(iframe);
 
 		stop();
-		walker();
 	});
 })(this);

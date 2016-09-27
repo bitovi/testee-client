@@ -2,32 +2,102 @@
 
 [![Build Status](https://travis-ci.org/bitovi/testee-client.svg?branch=master)](https://travis-ci.org/bitovi/testee-client)
 
-Testee client side adapters for Mocha, QUnit and Jasmine that convert test results into Feathers service socket calls (`runs`, `suites` and `tests`).
+Testee client side adapters for Mocha, QUnit and Jasmine (1 and 2) that convert test results into Feathers service calls (`runs`, `suites`, `tests` and `coverages`).
 
 ## Initializing options
 
-In you test page you can set Testee options using `window.Testee`. To report to a different server for example set:
+In your test page you can set Testee options using `window.Testee`. 
+
+### BaseURL
+
+By default, the client will use the url the tests are running at (`window.location.protocol + '//' + window.location.host`). you can change this using the `baseURL` option:
 
 ```html
+<script type="text/javascript">
+window.Testee = {
+  baseURL: 'http://testee-server.com/'
+}
+</script>
+<script type="text/javascript" src="testee-client.js"></script>
+```
+
+### Provider
+
+By default, the client will use socket.io to make Feathers service calls. You can change this to use REST by specifying the `provider` option:
+
+```html
+<script type="text/javascript">
+window.Testee = {
+  provider: {
+    type: 'rest'
+  }
+}
+</script>
+<script type="text/javascript" src="testee-client.js"></script>
+```
+
+### Socket
+
+You can provide your own socket instance to make Feathers service calls using the `socket` option:
+
+```html
+<script type="text/javascript" src="http://testee-server.com/socket.io/socket.io.js"></script>
 <script type="text/javascript">
 window.Testee = {
   socket: io('http://testee-server.com/')
 }
 </script>
-<script type="text/javascript" src="http://testee-server.com/socket.io/socket.io.js"></script>
 <script type="text/javascript" src="testee-client.js"></script>
 ```
 
-When loading files asynchronously:
+## Asynchronous Loading
+
+When loading files asynchronously, you need to stop your testing framework from running until all test files are loaded. Then call `window.Testee.init()`. If you're using [steal](https://www.npmjs.com/package/steal), you can use the [steal-mocha](https://www.npmjs.com/package/steal-mocha), [steal-qunit](https://www.npmjs.com/package/steal-qunit) or [steal-jasmine](https://www.npmjs.com/package/steal-jasmine) libraries.
+
+### Mocha
 
 ```html
+<script type="text/javascript" src="//best/cdn/ever/mocha/mocha.js"></script>
+<script type="text/javascript" src="testee-client.js"></script>
 <script type="text/javascript">
-window.Testee = {
-  autoInit: false
-}
+define(['tests.js'], function() {
+  if(window.Testee) {
+    window.Testee.init();
+  }
+  mocha.run();
+});
+</script>
+```
 
-define(['testee-client', 'qunit'], function() {
-  window.Testee.init();
+### QUnit
+
+```html
+<script type="text/javascript" src="//best/cdn/ever/qunit.js"></script>
+<script type="text/javascript" src="testee-client.js"></script>
+<script type="text/javascript">
+QUnit.config.autorun = false;
+define(['tests.js'], function() {
+  if(window.Testee) {
+    window.Testee.init();
+  }
+  QUnit.load();
+});
+</script>
+```
+
+### Jasmine
+
+```html
+<script type="text/javascript" src="//best/cdn/ever/jasmine/jasmine.js"></script>
+<script type="text/javascript" src="//best/cdn/ever/jasmine/jasmine-html.js"></script>
+<script type="text/javascript" src="//best/cdn/ever/jasmine/boot.js"></script>
+<script type="text/javascript" src="testee-client.js"></script>
+<script type="text/javascript">
+define(['tests.js'], function() {
+  if(window.Testee) {
+    window.Testee.init();
+  }
+  window.onload();
 });
 </script>
 ```
