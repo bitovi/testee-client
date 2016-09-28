@@ -97,7 +97,7 @@ module.exports = function(options) {
       }
 
       this.call('runs', 'patch', data.id, data).then(function() {
-        if (typeof socket.disconnect === 'function') {
+        if (socket && typeof socket.disconnect === 'function') {
           socket.disconnect();
         }
       });

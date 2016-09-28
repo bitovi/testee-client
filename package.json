@@ -47,11 +47,15 @@
     "url": "https://github.com/bitovi/testee-client/issues"
   },
   "homepage": "https://github.com/bitovi/testee-client",
-  "dependencies": {},
+  "dependencies": {
+    "feathers-rest": "^1.5.0",
+    "superagent": "^2.3.0"
+  },
   "devDependencies": {
     "chai": "^3.5.0",
     "core-js": "^2.4.1",
     "feathers": "^2.0.1",
+    "feathers-client": "^1.6.1",
     "feathers-socketio": "^1.4.1",
     "grunt": "^1.0.1",
     "grunt-cli": "^1.2.0",
@@ -65,7 +69,6 @@
     "qunitjs": "^1.23.1",
     "socket.io-client": "^1.4.8",
     "steal": "^1.0.0-rc.3",
-    "steal-tools": "^1.0.0-rc.1",
-    "wolfy87-eventemitter": "^5.1.0"
+    "steal-tools": "^1.0.0-rc.1"
   }
 }

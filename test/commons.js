@@ -15,39 +15,38 @@ var compare = window.compare = function(reference, actual, name) {
   }
 };
 
-window.walkExpected = function(expected, socket) {
+window.getTesteeOptions = function(name, expected) {
+  // Create a client-side service that checks that the proper calls are happening
   var index = 0;
-
-  // This one goes through all the expected events, binds once to the fake Socket
-  // and checks if the object we got from the test is the same as the one we expect
-  return function expectNext() {
+  var app = window.feathers();
+  var check = function(name, data, cb) {
     var current = expected[index];
 
-    socket.once(current.name, function(data, other) {
-      var callback = arguments[arguments.length - 1];
+    compare(current.data, data, current.name);
 
-      // move data for patch requests which pass the id first
-      if (typeof data === 'string') {
-        data = other;
-      }
+    cb(null, data);
 
-      compare(current.data, data, current.name);
-
-      callback(null, data);
-
-      if (++index === expected.length) {
-        return start();
-      }
-
-      expectNext();
-    });
+    if (++index === expected.length) {
+      start();
+    }
   };
-};
-
-window.getTesteeOptions = function(name) {
+  var expectationService = function(name) {
+    return {
+      create: function(data, params, cb) {
+        check(name + '::create', data, cb);
+      },
+      patch: function(id, data, params, cb) {
+        check(name + '::patch', data, cb);
+      }
+    };
+  };
+  app.use('api/runs', expectationService('api/runs'));
+  app.use('api/suites', expectationService('api/suites'));
+  app.use('api/tests', expectationService('api/tests'));
+  app.use('api/coverages', expectationService('api/coverages'));
+  
   var options = window.Testee[name] = {
-    socket: new window.EventEmitter()
+    app: app
   };
-  options.socket.connected = true;
   return options;
 };
