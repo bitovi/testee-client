@@ -27,7 +27,7 @@
     "jasmine",
     "testee"
   ],
-  "system": {
+  "steal": {
     "main": "testee-client/index",
     "directories": {
       "lib": "src"
