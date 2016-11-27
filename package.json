@@ -67,7 +67,7 @@
     "md5": "^2.2.1",
     "mocha": "^3.0.2",
     "qunitjs": "^1.23.1",
-    "socket.io-client": "^1.4.8",
+    "socket.io-client": "^1.7.0",
     "steal": "^1.0.0-rc.3",
     "steal-tools": "^1.0.0-rc.1"
   }
