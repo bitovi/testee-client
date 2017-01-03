@@ -1,3 +1,7 @@
+function inRange(expected, current, range) {
+  return (current - range) <= expected && (current + range) >= expected;
+}
+
 // Recursively compares if an actual object has the same properties
 var compare = window.compare = function(reference, actual, name) {
   var expected, current;
@@ -9,6 +13,8 @@ var compare = window.compare = function(reference, actual, name) {
       ok(expected.test(current), name + ': ' + current + ' matches ' + expected.toString());
     } else if (typeof reference[key] === 'object') {
       compare(expected, current, name + ' ' + key);
+    } else if(key === 'duration') {
+      ok(inRange(expected, current, 20), name + ' ' + key + ' === ' + expected + '(+/- 20)');
     } else {
       equal(expected, current, name + ' ' + key + ' === ' + expected);
     }
