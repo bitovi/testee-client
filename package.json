@@ -36,7 +36,7 @@
       "core-js/client/core": {
         "format": "amd"
       },
-      "socket.io-client/socket.io": {
+      "socket.io-client/dist/socket.io": {
         "format": "amd"
       }
     }

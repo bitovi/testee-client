@@ -7,7 +7,7 @@ var _ = {
 var feathers = require('feathers/client');
 var rest = require('feathers-rest/client');
 var superagent = require('superagent/lib/client');
-var io = require('socket.io-client/socket.io');
+var io = require('socket.io-client/dist/socket.io');
 var socketio = require('feathers-socketio/client');
 
 var ready = require('./docready');
