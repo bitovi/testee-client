@@ -60,14 +60,16 @@ module.exports = function(options) {
 
     pass: function(data) {
       data = Object.assign({
-        status: 'passed'
+        status: 'passed',
+        state: 'passed'
       }, data);
       this.call('tests', 'patch', data.id, data);
     },
 
     fail: function(data) {
       data = Object.assign({
-        status: 'failed'
+        status: 'failed',
+        state: 'failed'
       }, data);
       this.call('tests', 'patch', data.id, data);
     },
