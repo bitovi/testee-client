@@ -60,7 +60,7 @@
     "grunt": "^1.0.1",
     "grunt-cli": "^1.2.0",
     "grunt-contrib-qunit": "^1.2.0",
-    "install": "^0.8.1",
+    "install": "^0.8.4",
     "jasmine-core": "^2.5.1",
     "jshint": "^2.9.3",
     "lodash": "^4.15.0",
