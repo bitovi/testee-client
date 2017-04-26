@@ -47,6 +47,12 @@
 			}
 		}
 	}, {
+		"name": "api/logs::create",
+		"data": {
+			"type": "error",
+			"args": [ "This test failed" ]
+		}
+	}, {
 		"name": "api/suites::patch",
 		"data": {
 			"status": "finished"
@@ -68,6 +74,12 @@
 		"name": "api/tests::patch",
 		"data": {
 			"status": "passed"
+		}
+	}, {
+		"name": "api/logs::create",
+		"data": {
+			"type": "log",
+			"args": [ "Fail" ]
 		}
 	}, {
 		"name": "api/suites::patch",

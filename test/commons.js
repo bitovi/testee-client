@@ -8,7 +8,7 @@ var compare = window.compare = function(reference, actual, name) {
   for (var key in reference) {
     expected = reference[key];
     current = actual[key];
-
+    
     if (expected instanceof RegExp) {
       ok(expected.test(current), name + ': ' + current + ' matches ' + expected.toString());
     } else if (typeof reference[key] === 'object') {
@@ -50,6 +50,7 @@ window.getTesteeOptions = function(name, expected) {
   app.use('api/suites', expectationService('api/suites'));
   app.use('api/tests', expectationService('api/tests'));
   app.use('api/coverages', expectationService('api/coverages'));
+  app.use('api/logs', expectationService('api/logs'));
   
   var options = window.Testee[name] = {
     app: app
