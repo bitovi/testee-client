@@ -23,10 +23,15 @@ module.exports = function(options) {
     },
 
     log: function(type, args) {
+      var convertedArgs = [];
+      for(var i = 0; i < args.length; i++) {
+        convertedArgs.push(args[i]);
+      }
+
       this.call('logs', 'create', {
         parent: this._root.id,
         type: type,
-        args: args
+        args: convertedArgs
       });
     },
 
