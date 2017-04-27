@@ -16,26 +16,30 @@ module.exports = function(options) {
       // Chain this service call to make sure it only runs
       // after all previous returned with an ACK
       this.connect = this.connect.then(function() {
-        return new Promise(function(resolve, reject) {
-          args.push({});
-          args.push(function(error, data) {
-            if (error) {
-              reject(data);
-            } else {
-              resolve(data);
-            }
-          });
-          service[method].apply(service, args);
-        });
+        return service[method].apply(service, args);
       });
 
       return this.connect;
+    },
+
+    log: function(type, args) {
+      var convertedArgs = [];
+      for(var i = 0; i < args.length; i++) {
+        convertedArgs.push(args[i]);
+      }
+
+      this.call('logs', 'create', {
+        parent: this._root.id,
+        type: type,
+        args: convertedArgs
+      });
     },
 
     start: function(data) {
       data = Object.assign({
         status: 'running'
       }, file, data);
+      this._root = data;
       this.call('runs', 'create', data);
     },
 

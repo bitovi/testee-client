@@ -41,6 +41,8 @@ ready(function() {
 
     coverages: options.app.service('api/coverages'),
 
+    logs: options.app.service('api/logs'),
+
     runner: function() {
       if (!this._runner) {
         this._runner = Runner(options);
@@ -54,6 +56,10 @@ ready(function() {
     },
 
     init: function() {
+      var oldLog = window.console && window.console.log;
+      var oldError = window.console && window.console.error;
+      var self = this;
+
       if (window.QUnit) {
         this.initQUnit(window.QUnit);
       }
@@ -68,6 +74,18 @@ ready(function() {
 
       if (window.mocha && window.Mocha) {
         this.initMocha(window.mocha);
+      }
+
+      if(typeof oldLog === 'function' && typeof oldError === 'function') {
+        window.console.log = function() {
+          self.runner().log('log', arguments);
+          return oldLog.apply(this, arguments);
+        };
+
+        window.console.error = function() {
+          self.runner().log('error', arguments);
+          return oldError.apply(this, arguments);
+        };
       }
     },
 
