@@ -59,6 +59,7 @@ function mountMockApp (onLog) {
   app.use('api/suites', expectationService('api/suites'));
   app.use('api/tests', expectationService('api/tests'));
   app.use('api/coverages', expectationService('api/coverages'));
+  app.use('api/logs', expectationService('api/logs'));
 
   window.TesteeMock = {app: app};
 
@@ -155,6 +156,12 @@ var qunitSnapshot = [{
     }
   }
 }, {
+  "name": "api/logs::create",
+  "data": {
+    "type": "error",
+    "args": [ "This test failed" ]
+  }
+}, {
   "name": "api/suites::patch",
   "data": {
     "status": "finished"
@@ -176,6 +183,12 @@ var qunitSnapshot = [{
   "name": "api/tests::patch",
   "data": {
     "status": "passed"
+  }
+}, {
+  "name": "api/logs::create",
+  "data": {
+    "type": "log",
+    "args": [ "This is a test of console.log collection" ]
   }
 }, {
   "name": "api/suites::patch",
