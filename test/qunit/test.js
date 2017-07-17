@@ -1,19 +1,21 @@
-module('Test module');
+var unit = window.QUnit;
 
-test('A failing test', function() {
-  equal('A', 'B', 'This test should fail');
+unit.module('Test module');
+
+unit.test('A failing test', function (assert) {
+  assert.equal('A', 'B', 'This test should fail');
 });
 
-test('It does something', function() {
-  ok(true, 'Test ran!');
+unit.test('It does something', function (assert) {
+  assert.ok(true, 'Test ran!');
 });
 
-module('Other module');
+unit.module('Other module');
 
-test('It does something async', function() {
-  stop();
-  setTimeout(function() {
-    ok(true, 'Async test ran!');
-    start();
+unit.test('It does something async', function(assert) {
+  var done = assert.async();
+  setTimeout(function () {
+    assert.ok(true, 'Async test ran!');
+    done();
   }, 200);
 });

@@ -7,7 +7,7 @@
 </head>
 <body>
   <div id="mocha"></div>
-  
+
   <script src="../../node_modules/chai/chai.js" type="text/javascript"></script>
   <script src="../../node_modules/mocha/mocha.js" type="text/javascript"></script>
   <script type="text/javascript">
@@ -20,7 +20,7 @@
     window.expect = chai.expect;
 
     window.__coverage__ = { test: 'Mocha coverage' };
-    window.Testee = window.top.Testee.Mocha;
+    window.Testee = window.top.TesteeMock;
   </script>
 
   <script type="text/javascript" src="../../dist/testee.js"></script>

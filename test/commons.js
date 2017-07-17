@@ -50,7 +50,7 @@ window.getTesteeOptions = function(name, expected) {
   app.use('api/suites', expectationService('api/suites'));
   app.use('api/tests', expectationService('api/tests'));
   app.use('api/coverages', expectationService('api/coverages'));
-  
+
   var options = window.Testee[name] = {
     app: app
   };

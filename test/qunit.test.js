@@ -1,6 +1,7 @@
-(function(window, undefined) {
+(function(window) {
 
-	module('QUnit adapter test');
+	var unit = window.QUnit;
+	unit.module('QUnit adapter test');
 
 	var expected = [{
 		"name": "api/runs::create",
@@ -137,15 +138,17 @@
 		}
 	}];
 
-	window.getTesteeOptions('QUnit', expected);
+	// window.getTesteeOptions('QUnit', expected);
 
-	test('runs the QUnit test and writes expected data', function() {
-		// Insert the iframe with the test
-		var iframe = document.createElement('iframe');
+	unit.test('runs the QUnit test and writes expected data', function(assert) {
+		var done = assert.async();
+		var snapshot = expected.map(function (record) {
+			return record.data;
+		});
 
-		iframe.src = 'qunit/qunit.html';
-		document.getElementById('qunit-fixture').appendChild(iframe);
-
-		stop();
+		window.runFrameTests('qunit/qunit.html', snapshot.length, function (results) {
+			assert.deepEqual(results, snapshot, 'Logs should match the snapshot');
+			done();
+		});
 	});
 })(this);
