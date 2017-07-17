@@ -1,3 +1,20 @@
+/*
+How testee-client is tested:
+
+For each supported testing framework there are respective tests.
+These tests follow the pattern:
+    test/<framework>/<framework>.html : the test page
+    test/<framework>/test.js : the tests
+
+In an iframe, each test.html page loads the test.js file and also:
+  - does the specific loading/setup of the particular test runner
+  - sets up Testee client using the parent window's provided mock
+
+The provided mock intercepts all the calls made to the Testee client
+and collects them into an array which is compared to the expected logs
+for that particular test framework.
+*/
+
 function inRange(expected, current, range) {
   return (current - range) <= expected && (current + range) >= expected;
 }
@@ -232,6 +249,145 @@ unit.test(
   testTester('qunit/qunit.html', qunitSnapshot)
 );
 
+var qunit2Snapshot = [{
+  "name": "api/runs::create",
+  "data": {
+    "status": "running",
+    "environment": navigator.userAgent,
+    "runner": "QUnit",
+    "file": /qunit2\/qunit2\.html/
+  }
+}, {
+  "name": "api/suites::create",
+  "data": {
+    "status": "running",
+    "title": "QUnit example",
+    "root": true,
+    "file": /qunit2\/qunit2\.html/
+  }
+}, {
+  "name": "api/suites::create",
+  "data": {
+    "status": "running",
+    "title": "Test module",
+    "file": /qunit2\/qunit2\.html/
+  }
+}, {
+  "name": "api/suites::create",
+  "data": {
+    "status": "running",
+    "title": "A failing test",
+    "file": /qunit2\/qunit2\.html/
+  }
+}, {
+  "name": "api/tests::create",
+  "data": {
+    "title": "This test should fail",
+    "file": /qunit2\/qunit2\.html/
+  }
+}, {
+  "name": "api/tests::patch",
+  "data": {
+    "status": "failed",
+    "err": {
+      "message": "Expected B but was A"
+    }
+  }
+}, {
+  "name": "api/suites::patch",
+  "data": {
+    "status": "finished"
+  }
+}, {
+  "name": "api/suites::create",
+  "data": {
+    "status": "running",
+    "title": "It does something",
+    "file": /qunit2\/qunit2\.html/
+  }
+}, {
+  "name": "api/tests::create",
+  "data": {
+    "title": "Test ran!",
+    "file": /qunit2\/qunit2\.html/
+  }
+}, {
+  "name": "api/tests::patch",
+  "data": {
+    "status": "passed"
+  }
+}, {
+  "name": "api/suites::patch",
+  "data": {
+    "status": "finished"
+  }
+}, {
+  "name": "api/suites::patch",
+  "data": {
+    "status": "finished",
+    "failed": 1,
+    "total": 2
+  }
+}, {
+  "name": "api/suites::create",
+  "data": {
+    "status": "running",
+    "title": "Other module",
+    "file": /qunit2\/qunit2\.html/
+  }
+}, {
+  "name": "api/suites::create",
+  "data": {
+    "status": "running",
+    "title": "It does something async",
+    "file": /qunit2\/qunit2\.html/
+  }
+}, {
+  "name": "api/tests::create",
+  "data": {
+    "title": "Async test ran!",
+    "file": /qunit2\/qunit2\.html/
+  }
+}, {
+  "name": "api/tests::patch",
+  "data": {
+    "status": "passed"
+  }
+}, {
+  "name": "api/suites::patch",
+  "data": {
+    "status": "finished"
+  }
+}, {
+  "name": "api/suites::patch",
+  "data": {
+    "status": "finished",
+    "failed": 0,
+    "total": 1
+  }
+}, {
+  "name": "api/suites::patch"
+}, {
+  "name": "api/coverages::create",
+  "data": {
+    coverage: {
+      "test": "Qunit coverage"
+    }
+  }
+}, {
+  "name": "api/runs::patch",
+  "data": {
+    "status": "finished",
+    "failed": 1,
+    "passed": 2,
+    "total": 3
+  }
+}];
+unit.test(
+  'runs the QUnit test and writes expected data',
+  testTester('qunit2/qunit2.html', qunit2Snapshot)
+);
+
 var mochaSnapshot = [{
   "name": "api/runs::create",
   "data": {
@@ -404,7 +560,7 @@ var jasmineSnapshot = [{
     "status": "running",
     "environment": navigator.userAgent,
     "runner": "Jasmine",
-    "file": /jasmine-1\/jasmine\.html/
+    "file": /jasmine\/jasmine\.html/
   }
 }, {
   "name": "api/suites::create",
@@ -412,20 +568,20 @@ var jasmineSnapshot = [{
     "status": "running",
     "title": "Test module",
     "root": true,
-    "file": /jasmine-1\/jasmine\.html/
+    "file": /jasmine\/jasmine\.html/
   }
 }, {
   "name": "api/suites::create",
   "data": {
     "status": "running",
     "title": "It does something",
-    "file": /jasmine-1\/jasmine\.html/
+    "file": /jasmine\/jasmine\.html/
   }
 }, {
   "name": "api/tests::create",
   "data": {
     "title": "Fails",
-    "file": /jasmine-1\/jasmine\.html/
+    "file": /jasmine\/jasmine\.html/
   }
 }, {
   "name": "api/tests::patch",
@@ -445,14 +601,14 @@ var jasmineSnapshot = [{
   "data": {
     "status": "running",
     "title": "Some other suite",
-    "file": /jasmine-1\/jasmine\.html/
+    "file": /jasmine\/jasmine\.html/
   }
 }, {
   "name": "api/suites::create",
   "data": {
     "status": "running",
     "title": "Nested suite",
-    "file": /jasmine-1\/jasmine\.html/
+    "file": /jasmine\/jasmine\.html/
   }
 }, {
   "name": "api/tests::create",
@@ -497,7 +653,7 @@ var jasmineSnapshot = [{
 }];
 unit.test(
   'runs the Jasmine 1 test and writes expected data',
-  testTester('jasmine-1/jasmine.html', jasmineSnapshot)
+  testTester('jasmine/jasmine.html', jasmineSnapshot)
 );
 
 var jasmine2Snapshot = [{
@@ -506,7 +662,7 @@ var jasmine2Snapshot = [{
     "status": "running",
     "environment": navigator.userAgent,
     "runner": "Jasmine",
-    "file": /jasmine\/jasmine\.html/
+    "file": /jasmine2\/jasmine2\.html/
   }
 }, {
   "name": "api/suites::create",
@@ -514,26 +670,26 @@ var jasmine2Snapshot = [{
     "status": "running",
     "title": "Test module",
     "root": true,
-    "file": /jasmine\/jasmine\.html/
+    "file": /jasmine2\/jasmine2\.html/
   }
 }, {
   "name": "api/suites::create",
   "data": {
     "status": "running",
     "title": "It does something",
-    "file": /jasmine\/jasmine\.html/
+    "file": /jasmine2\/jasmine2\.html/
   }
 }, {
   "name": "api/tests::create",
   "data": {
     "title": "Skipped test",
-    "file": /jasmine\/jasmine\.html/
+    "file": /jasmine2\/jasmine2\.html/
   }
 }, {
   "name": "api/tests::create",
   "data": {
     "title": "Fails",
-    "file": /jasmine\/jasmine\.html/
+    "file": /jasmine2\/jasmine2\.html/
   }
 }, {
   "name": "api/tests::patch",
@@ -553,14 +709,14 @@ var jasmine2Snapshot = [{
   "data": {
     "status": "running",
     "title": "Some other suite",
-    "file": /jasmine\/jasmine\.html/
+    "file": /jasmine2\/jasmine2\.html/
   }
 }, {
   "name": "api/suites::create",
   "data": {
     "status": "running",
     "title": "Nested suite",
-    "file": /jasmine\/jasmine\.html/
+    "file": /jasmine2\/jasmine2\.html/
   }
 }, {
   "name": "api/tests::create",
@@ -605,5 +761,5 @@ var jasmine2Snapshot = [{
 }];
 unit.test(
   'runs the Jasmine 2 test and writes expected data',
-  testTester('jasmine/jasmine.html', jasmine2Snapshot)
+  testTester('jasmine2/jasmine2.html', jasmine2Snapshot)
 );
