@@ -7,7 +7,7 @@ test('A failing test', function() {
 
 test('It does something', function() {
   ok(true, 'Test ran!');
-  console.log('Fail');
+  console.log('This is a test of console.log collection');
 });
 
 module('Other module');
