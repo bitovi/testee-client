@@ -78,6 +78,22 @@ module.exports = function(options) {
       this.call('tests', 'patch', data.id, data);
     },
 
+    hook: function(data) {
+      data = Object.assign({}, file, data);
+      this.call('hooks', 'create', data);
+    },
+
+    hookEnd: function() {},
+
+    hookFail: function(data) {
+      data = Object.assign({
+        status: 'failed',
+        state: 'failed'
+      }, data);
+
+      this.call('hooks', 'patch', data.id, data);
+    },
+
     testEnd: function() {},
 
     suiteEnd: function(data) {

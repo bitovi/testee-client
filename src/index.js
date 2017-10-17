@@ -39,6 +39,8 @@ ready(function() {
 
     tests: options.app.service('api/tests'),
 
+    hooks: options.app.service('api/hooks'),
+
     coverages: options.app.service('api/coverages'),
 
     logs: options.app.service('api/logs'),

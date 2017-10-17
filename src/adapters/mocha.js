@@ -12,7 +12,8 @@ function TesteeReporter(runner) {
   var self = this;
   var methodMappings = {
     'test end': 'testEnd',
-    'suite end': 'suiteEnd'
+    'suite end': 'suiteEnd',
+    'hook end': 'hookEnd'
   };
   var pipe = function(type, converter) {
     runner.on(type, function() {
@@ -40,15 +41,6 @@ function TesteeReporter(runner) {
     };
   });
 
-  pipe('fail', function(data, err) {
-    var diff = self.diff(data);
-    diff.err = {
-      message: err.message,
-      stack: err.stack || ''
-    };
-    return diff;
-  });
-
   pipe('end', function(data) {
     var diff = self.diff(data);
 
@@ -70,7 +62,20 @@ function TesteeReporter(runner) {
     return diff;
   });
 
-  _.each(['suite end', 'pending', 'test', 'test end', 'pass'], function(name) {
+  runner.on('fail', function(phase, err) {
+    var data = self.diff(phase);
+    data.err = {
+      message: err.message,
+      stack: err.stack || ''
+    };
+    if (phase.type === 'hook') {
+      self.api['hookFail'](data);
+    } else {
+      self.api['fail'](data);
+    }
+  });
+
+  _.each(['suite end', 'pending', 'test', 'test end', 'pass', 'hook', 'hook end'], function(name) {
     pipe(name, _.bind(self.diff, self));
   });
 
