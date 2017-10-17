@@ -4,6 +4,7 @@ var _ = {
   each: require('lodash/each'),
   bind: require('lodash/bind'),
   indexOf: require('lodash/indexOf'),
+  find: require('lodash/find'),
   clone: require('lodash/clone')
 };
 var guid = require('./../guid');
@@ -62,6 +63,30 @@ function TesteeReporter(runner) {
     return diff;
   });
 
+  _.each(['suite end', 'pending', 'test', 'test end', 'pass'], function(name) {
+    pipe(name, _.bind(self.diff, self));
+  });
+
+  runner.on('hook', function(hook) {
+    // hook may already have been created since they are often run multiple times
+    var hookAlreadyExists = _.find(self.ids, function(phase) { return phase.fn === hook.fn; });
+    var data = self.diff(hook);
+    data.status = 'running';
+    data.state = 'running';
+    if (hookAlreadyExists) {
+      self.api['updateHook'](data);
+    } else {
+      self.api['createHook'](data);
+    }
+  });
+
+  runner.on('hook end', function(hook) {
+    var data = self.diff(hook);
+    data.status = 'ended';
+    data.state = 'ended';
+    self.api['updateHook'](data);
+  });
+
   runner.on('fail', function(phase, err) {
     var data = self.diff(phase);
     data.err = {
@@ -69,14 +94,12 @@ function TesteeReporter(runner) {
       stack: err.stack || ''
     };
     if (phase.type === 'hook') {
-      self.api['hookFail'](data);
+      data.status = 'failed';
+      data.state = 'failed';
+      self.api['updateHook'](data);
     } else {
       self.api['fail'](data);
     }
-  });
-
-  _.each(['suite end', 'pending', 'test', 'test end', 'pass', 'hook', 'hook end'], function(name) {
-    pipe(name, _.bind(self.diff, self));
   });
 
   runner.on('pending', function() {
