@@ -4,6 +4,7 @@ var _ = {
   each: require('lodash/each'),
   bind: require('lodash/bind'),
   indexOf: require('lodash/indexOf'),
+  find: require('lodash/find'),
   clone: require('lodash/clone')
 };
 var guid = require('./../guid');
@@ -12,7 +13,8 @@ function TesteeReporter(runner) {
   var self = this;
   var methodMappings = {
     'test end': 'testEnd',
-    'suite end': 'suiteEnd'
+    'suite end': 'suiteEnd',
+    'hook end': 'hookEnd'
   };
   var pipe = function(type, converter) {
     runner.on(type, function() {
@@ -40,15 +42,6 @@ function TesteeReporter(runner) {
     };
   });
 
-  pipe('fail', function(data, err) {
-    var diff = self.diff(data);
-    diff.err = {
-      message: err.message,
-      stack: err.stack || ''
-    };
-    return diff;
-  });
-
   pipe('end', function(data) {
     var diff = self.diff(data);
 
@@ -72,6 +65,41 @@ function TesteeReporter(runner) {
 
   _.each(['suite end', 'pending', 'test', 'test end', 'pass'], function(name) {
     pipe(name, _.bind(self.diff, self));
+  });
+
+  runner.on('hook', function(hook) {
+    // hook may already have been created since they are often run multiple times
+    var hookAlreadyExists = _.find(self.ids, function(phase) { return phase.fn === hook.fn; });
+    var data = self.diff(hook);
+    data.status = 'running';
+    data.state = 'running';
+    if (hookAlreadyExists) {
+      self.api['updateHook'](data);
+    } else {
+      self.api['createHook'](data);
+    }
+  });
+
+  runner.on('hook end', function(hook) {
+    var data = self.diff(hook);
+    data.status = 'ended';
+    data.state = 'ended';
+    self.api['updateHook'](data);
+  });
+
+  runner.on('fail', function(phase, err) {
+    var data = self.diff(phase);
+    data.err = {
+      message: err.message,
+      stack: err.stack || ''
+    };
+    if (phase.type === 'hook') {
+      data.status = 'failed';
+      data.state = 'failed';
+      self.api['updateHook'](data);
+    } else {
+      self.api['fail'](data);
+    }
   });
 
   runner.on('pending', function() {

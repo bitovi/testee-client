@@ -78,6 +78,15 @@ module.exports = function(options) {
       this.call('tests', 'patch', data.id, data);
     },
 
+    createHook: function(data) {
+      data = Object.assign({}, file, data);
+      this.call('hooks', 'create', data);
+    },
+
+    updateHook: function(data) {
+      this.call('hooks', 'patch', data.id, data);
+    },
+
     testEnd: function() {},
 
     suiteEnd: function(data) {
