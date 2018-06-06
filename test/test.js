@@ -567,6 +567,224 @@ unit.test(
   testTester('mocha/mocha.html', mochaSnapshot)
 );
 
+// var mochaErrorsSnapshot = [{
+//   "name": "api/runs::create",
+//   "data": {
+//     "status": "running",
+//     "environment": navigator.userAgent,
+//     "runner": "Mocha",
+//     "file": /mocha\/mocha-errors\.html/
+//   }
+// }, {
+//   "name": "api/suites::create",
+//   "data": {
+//     "status": "running",
+//     "title": "",
+//     "pending": false,
+//     "root": true,
+//     "file": /mocha\/mocha-errors\.html/
+//   }
+// }, {
+//   "name": "api/suites::create",
+//   "data": {
+//     "status": "running",
+//     "title": "mocha",
+//     "pending": false,
+//     "root": false,
+//     "file": /mocha\/mocha-errors\.html/
+//   }
+// }, {
+//   "name": "api/suites::create",
+//   "data": {
+//     "status": "running",
+//     "title": "Errors in setup/teardown",
+//     "pending": false,
+//     "root": false,
+//     "file": /mocha\/mocha-errors\.html/
+//   }
+// }, {
+//   "name": "api/suites::create",
+//   "data": {
+//     "status": "running",
+//     "title": "before",
+//     "pending": false,
+//     "root": false,
+//     "file": /mocha\/mocha-errors\.html/
+//   }
+// }, {
+//   "name": "api/tests::create",
+//   "data": {
+//     "title": "passes",
+//     "sync": true,
+//     "timedOut": false,
+//     //"pending": true,
+//     "type": "test",
+//     //"status": "pending",
+//     "file": /mocha\/mocha-errors\.html/
+//   }
+// }, {
+//   "name": "api/tests::patch",
+//   "data": {
+//     "status": "failed",
+//     "state": "failed",
+//     "title": "\"before all\" hook",
+//     "err": {
+//       "message": "Test error"
+//     }
+//   }
+// }, {
+//   "name": "api/suites::patch",
+//   "data": {
+//     "status": "finished"
+//   }
+// }, {
+//   "name": "api/suites::create",
+//   "data": {
+//     "status": "running",
+//     "title": "beforeEach",
+//     "pending": false,
+//     "root": false,
+//     "file": /mocha\/mocha-errors\.html/
+//   }
+// }, {
+//   "name": "api/tests::create",
+//   "data": {
+//     "title": "passes",
+//     "sync": true,
+//     "timedOut": false,
+//     "type": "test",
+//     "file": /mocha\/mocha-errors\.html/
+//   }
+// }, {
+//   "name": "api/tests::patch",
+//   "data": {
+//     "status": "failed",
+//     "state": "failed",
+//     "title": "\"before each\" hook for \"passes\"",
+//     "err": {
+//       "message": "Test error"
+//     }
+//   }
+// }, {
+//   "name": "api/suites::patch",
+//   "data": {
+//     "status": "finished"
+//   }
+// }, {
+//   "name": "api/suites::create",
+//   "data": {
+//     "status": "running",
+//     "title": "afterEach",
+//     "pending": false,
+//     "root": false,
+//     "file": /mocha\/mocha-errors\.html/
+//   }
+// }, {
+//   "name": "api/tests::create",
+//   "data": {
+//     "title": "passes",
+//     "sync": true,
+//     "timedOut": false,
+//     "type": "test",
+//     "file": /mocha\/mocha-errors\.html/
+//   }
+// }, {
+//   "name": "api/tests::patch",
+//   "data": {
+//     "status": "passed",
+//     "state": "passed"
+//   }
+// }, {
+//   "name": "api/tests::patch",
+//   "data": {
+//     "status": "failed",
+//     "state": "failed",
+//     "title": "\"after each\" hook for \"passes\"",
+//     "err": {
+//       "message": "Test error"
+//     }
+//   }
+// }, {
+//   "name": "api/suites::patch",
+//   "data": {
+//     "status": "finished"
+//   }
+// }, {
+//   "name": "api/suites::create",
+//   "data": {
+//     "status": "running",
+//     "title": "after",
+//     "pending": false,
+//     "root": false,
+//     "file": /mocha\/mocha-errors\.html/
+//   }
+// }, {
+//   "name": "api/tests::create",
+//   "data": {
+//     "title": "passes",
+//     "sync": true,
+//     "timedOut": false,
+//     "type": "test",
+//     "file": /mocha\/mocha-errors\.html/
+//   }
+// }, {
+//   "name": "api/tests::patch",
+//   "data": {
+//     "status": "passed",
+//     "state": "passed"
+//   }
+// }, {
+//   "name": "api/tests::patch",
+//   "data": {
+//     "status": "failed",
+//     "state": "failed",
+//     "title": "\"after all\" hook",
+//     "err": {
+//       "message": "Test error"
+//     }
+//   }
+// }, {
+//   "name": "api/suites::patch",
+//   "data": {
+//     "status": "finished"
+//   }
+// }, {
+//   "name": "api/suites::patch",
+//   "data": {
+//     "status": "finished"
+//   }
+// }, {
+//   "name": "api/suites::patch",
+//   "data": {
+//     "status": "finished"
+//   }
+// }, {
+//   "name": "api/suites::patch",
+//   "data": {
+//     "status": "finished"
+//   }
+// }, {
+//   "name": "api/coverages::create",
+//   "data": {
+//     coverage: {
+//       "test": "Mocha coverage"
+//     }
+//   }
+// }, {
+//   "name": "api/runs::patch",
+//   "data": {
+//     "status": "finished",
+//     "total": 6,
+//     "failed": 4,
+//     "pending": 0,
+//     "passed": 2
+//   }
+// }];
+// unit.test(
+//   'runs the Mocha test and errors as appropriate',
+//   testTester('mocha/mocha-errors.html', mochaErrorsSnapshot)
+// );
+
 var jasmineSnapshot = [{
   "name": "api/runs::create",
   "data": {

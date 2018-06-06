@@ -41,11 +41,29 @@ function TesteeReporter(runner) {
   });
 
   pipe('fail', function(data, err) {
-    var diff = self.diff(data);
+    var diff;
+    var title = data.title;
+    if(data && data.type === "hook") {
+      if(data.ctx.currentTest) {
+        data = data.ctx.currentTest;
+      } else if(data.title === '"before all" hook') {
+        // tests in this suite will never run if before() fails,
+        //  so create the first test in order to fail it.
+        data = data.parent.tests[0];
+        diff = self.diff(data);
+        self.api['test'](diff);
+      } else {
+        // after all hook.  apply to last test, which has already ran
+        data = data.parent.tests[data.parent.tests.length - 1];
+      }
+    }
+
+    diff = self.diff(data);
     diff.err = {
       message: err.message,
       stack: err.stack || ''
     };
+    diff.title = title;
     return diff;
   });
 
