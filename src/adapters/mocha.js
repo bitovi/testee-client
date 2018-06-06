@@ -42,6 +42,10 @@ function TesteeReporter(runner) {
 
   pipe('fail', function(data, err) {
     var diff;
+    // Note: this is a workaround until https://github.com/bitovi/testee-client/pull/43
+    //  can be merged.  The associated server PR https://github.com/bitovi/testee/pull/163
+    //  currently is failing to pass the tests, so #43 cannot be merged. Once that is working
+    //  working, this change should be reverted. --BM 2018-06-06
     var title = data.title;
     if(data && data.type === "hook") {
       if(data.ctx.currentTest) {
