@@ -24,5 +24,4 @@ describe('Test module', function() {
       });
     });
   });
-
 });
