@@ -57,7 +57,7 @@ function TesteeReporter(runner) {
         data.parent.eachTest(function(t) {
           test = test || t;
         })
-        data = test;
+        data = test || data;
         diff = self.diff(data);
         self.api['test'](diff);
       } else {

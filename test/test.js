@@ -33,7 +33,7 @@ function compare (assert, reference, actual, name) {
     } else if(key === 'duration') {
       assert.ok(inRange(expected, current, 20), name + ' ' + key + ' === ' + expected + '(+/- 20)');
     } else {
-      assert.equal(expected, current, name + ' ' + key + ' === ' + expected);
+      assert.equal(current, expected, name + ' ' + key + ' === ' + expected);
     }
   }
 }
