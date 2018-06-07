@@ -9,3 +9,4 @@ deploy:
   on:
     tags: true
     repo: bitovi/testee-client
+  skip_cleanup: true
