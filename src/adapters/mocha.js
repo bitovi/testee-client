@@ -53,12 +53,18 @@ function TesteeReporter(runner) {
       } else if(data.title === '"before all" hook') {
         // tests in this suite will never run if before() fails,
         //  so create the first test in order to fail it.
-        data = data.parent.tests[0];
+        var test;
+        data.parent.eachTest(function(t) {
+          test = test || t;
+        })
+        data = test;
         diff = self.diff(data);
         self.api['test'](diff);
       } else {
         // after all hook.  apply to last test, which has already ran
-        data = data.parent.tests[data.parent.tests.length - 1];
+        data.parent.eachTest(function(t) {
+          data = t;
+        })
       }
     }
 
