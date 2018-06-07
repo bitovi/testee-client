@@ -12,12 +12,16 @@ module.exports = function(options) {
       var args = _.toArray(arguments).slice(2);
       var service = this[path];
 
-
-      // Chain this service call to make sure it only runs
-      // after all previous returned with an ACK
-      this.connect = this.connect.then(function() {
+      function cb() {
         return service[method].apply(service, args);
-      });
+      }
+      // Chain this service call to make sure it only runs
+      // after all previous returned with an ACK.
+      //
+      // If one fails, let it fail and error normally,
+      //  but continue with a resolved promise instead of a
+      //  rejected one.
+      this.connect = this.connect.then(cb, cb);
 
       return this.connect;
     },
