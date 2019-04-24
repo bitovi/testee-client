@@ -5,8 +5,7 @@ deploy:
   provider: npm
   email: core@donejs.com
   api_key:
-    secure: pDxk6Wpnf2aeXOePAKVmA8bZR0wYGCsPIsjnqsaEIJbouOVuUJG6ahyvztujIJn8AquIVLNMFsXuYooQpm7i9wVFfX7hI97LcQ/tICPwyNQOz0T2x0DtDrbTc6FKLXfVm7WMiMGiiGnMLqDdlbmU3TIupMRH7E0q2h6AQkp7Oos=
+    secure: hzbSCcVqYRmBGs+vpAyVopppfu8cwnMwHF+bhHFNCmLU/GVq9ZmAjP/xeIk5PCiiox/qqvIHjSg51FZYmKAgji+W4dCVpTUm2O0SIUGm4ZBJQis6BzOBWWU/bKbsjvxYNsVZMAjy1MHl3r5rysLNMW70lrhs6oTBOANkBLo3ok0=
   on:
     tags: true
     repo: bitovi/testee-client
-  skip_cleanup: true
