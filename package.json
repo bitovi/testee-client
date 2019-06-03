@@ -28,7 +28,7 @@
     },
     "meta": {
       "core-js/client/core": {
-        "format": "amd"
+        "format": "global"
       },
       "socket.io-client/dist/socket.io": {
         "format": "amd"
@@ -47,7 +47,7 @@
   },
   "devDependencies": {
     "chai": "^3.5.0",
-    "core-js": "^2.4.1",
+    "core-js": "^2.5.7",
     "feathers": "^2.0.1",
     "feathers-client": "^1.6.1",
     "feathers-socketio": "^1.4.1",
@@ -60,7 +60,7 @@
     "lodash": "^4.15.0",
     "md5": "^2.2.1",
     "mocha": "^3.0.2",
-    "qunitjs": "^2.1.1",
+    "qunit": "^2.4.1",
     "socket.io-client": "^1.7.2",
     "steal": "^1.0.0-rc.3",
     "steal-tools": "^1.0.0-rc.1"
