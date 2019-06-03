@@ -1,4 +1,4 @@
-module('Test module');
+QUnit.module('Test module');
 
 test('A failing test', function() {
   equal('A', 'B', 'This test should fail');
@@ -10,7 +10,7 @@ test('It does something', function() {
   console.log('This is a test of console.log collection');
 });
 
-module('Other module');
+QUnit.module('Other module');
 
 test('It does something async', function() {
   stop();
