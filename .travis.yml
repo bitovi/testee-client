@@ -1,5 +1,6 @@
 sudo: false
 language: node_js
+dist: focal
 node_js: node
 deploy:
   provider: npm
@@ -9,3 +10,4 @@ deploy:
   on:
     tags: true
     repo: bitovi/testee-client
+

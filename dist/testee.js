@@ -5464,7 +5464,7 @@ define('feathers-rest/client', [
 ], function (require, exports, module) {
     module.exports = require('feathers-rest/lib/client/index');
 });
-/*component-emitter@1.2.1#index*/
+/*component-emitter@1.3.0#index*/
 define('component-emitter', function (require, exports, module) {
     if (typeof module !== 'undefined') {
         module.exports = Emitter;
@@ -5515,11 +5515,17 @@ define('component-emitter', function (require, exports, module) {
                 break;
             }
         }
+        if (callbacks.length === 0) {
+            delete this._callbacks['$' + event];
+        }
         return this;
     };
     Emitter.prototype.emit = function (event) {
         this._callbacks = this._callbacks || {};
-        var args = [].slice.call(arguments, 1), callbacks = this._callbacks['$' + event];
+        var args = new Array(arguments.length - 1), callbacks = this._callbacks['$' + event];
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
         if (callbacks) {
             callbacks = callbacks.slice(0);
             for (var i = 0, len = callbacks.length; i < len; ++i) {
@@ -5536,15 +5542,236 @@ define('component-emitter', function (require, exports, module) {
         return !!this.listeners(event).length;
     };
 });
-/*superagent@3.8.3#lib/is-object*/
+/*fast-safe-stringify@2.1.1#index*/
+define('fast-safe-stringify', function (require, exports, module) {
+    module.exports = stringify;
+    stringify.default = stringify;
+    stringify.stable = deterministicStringify;
+    stringify.stableStringify = deterministicStringify;
+    var LIMIT_REPLACE_NODE = '[...]';
+    var CIRCULAR_REPLACE_NODE = '[Circular]';
+    var arr = [];
+    var replacerStack = [];
+    function defaultOptions() {
+        return {
+            depthLimit: Number.MAX_SAFE_INTEGER,
+            edgesLimit: Number.MAX_SAFE_INTEGER
+        };
+    }
+    function stringify(obj, replacer, spacer, options) {
+        if (typeof options === 'undefined') {
+            options = defaultOptions();
+        }
+        decirc(obj, '', 0, [], undefined, 0, options);
+        var res;
+        try {
+            if (replacerStack.length === 0) {
+                res = JSON.stringify(obj, replacer, spacer);
+            } else {
+                res = JSON.stringify(obj, replaceGetterValues(replacer), spacer);
+            }
+        } catch (_) {
+            return JSON.stringify('[unable to serialize, circular reference is too complex to analyze]');
+        } finally {
+            while (arr.length !== 0) {
+                var part = arr.pop();
+                if (part.length === 4) {
+                    Object.defineProperty(part[0], part[1], part[3]);
+                } else {
+                    part[0][part[1]] = part[2];
+                }
+            }
+        }
+        return res;
+    }
+    function setReplace(replace, val, k, parent) {
+        var propertyDescriptor = Object.getOwnPropertyDescriptor(parent, k);
+        if (propertyDescriptor.get !== undefined) {
+            if (propertyDescriptor.configurable) {
+                Object.defineProperty(parent, k, { value: replace });
+                arr.push([
+                    parent,
+                    k,
+                    val,
+                    propertyDescriptor
+                ]);
+            } else {
+                replacerStack.push([
+                    val,
+                    k,
+                    replace
+                ]);
+            }
+        } else {
+            parent[k] = replace;
+            arr.push([
+                parent,
+                k,
+                val
+            ]);
+        }
+    }
+    function decirc(val, k, edgeIndex, stack, parent, depth, options) {
+        depth += 1;
+        var i;
+        if (typeof val === 'object' && val !== null) {
+            for (i = 0; i < stack.length; i++) {
+                if (stack[i] === val) {
+                    setReplace(CIRCULAR_REPLACE_NODE, val, k, parent);
+                    return;
+                }
+            }
+            if (typeof options.depthLimit !== 'undefined' && depth > options.depthLimit) {
+                setReplace(LIMIT_REPLACE_NODE, val, k, parent);
+                return;
+            }
+            if (typeof options.edgesLimit !== 'undefined' && edgeIndex + 1 > options.edgesLimit) {
+                setReplace(LIMIT_REPLACE_NODE, val, k, parent);
+                return;
+            }
+            stack.push(val);
+            if (Array.isArray(val)) {
+                for (i = 0; i < val.length; i++) {
+                    decirc(val[i], i, i, stack, val, depth, options);
+                }
+            } else {
+                var keys = Object.keys(val);
+                for (i = 0; i < keys.length; i++) {
+                    var key = keys[i];
+                    decirc(val[key], key, i, stack, val, depth, options);
+                }
+            }
+            stack.pop();
+        }
+    }
+    function compareFunction(a, b) {
+        if (a < b) {
+            return -1;
+        }
+        if (a > b) {
+            return 1;
+        }
+        return 0;
+    }
+    function deterministicStringify(obj, replacer, spacer, options) {
+        if (typeof options === 'undefined') {
+            options = defaultOptions();
+        }
+        var tmp = deterministicDecirc(obj, '', 0, [], undefined, 0, options) || obj;
+        var res;
+        try {
+            if (replacerStack.length === 0) {
+                res = JSON.stringify(tmp, replacer, spacer);
+            } else {
+                res = JSON.stringify(tmp, replaceGetterValues(replacer), spacer);
+            }
+        } catch (_) {
+            return JSON.stringify('[unable to serialize, circular reference is too complex to analyze]');
+        } finally {
+            while (arr.length !== 0) {
+                var part = arr.pop();
+                if (part.length === 4) {
+                    Object.defineProperty(part[0], part[1], part[3]);
+                } else {
+                    part[0][part[1]] = part[2];
+                }
+            }
+        }
+        return res;
+    }
+    function deterministicDecirc(val, k, edgeIndex, stack, parent, depth, options) {
+        depth += 1;
+        var i;
+        if (typeof val === 'object' && val !== null) {
+            for (i = 0; i < stack.length; i++) {
+                if (stack[i] === val) {
+                    setReplace(CIRCULAR_REPLACE_NODE, val, k, parent);
+                    return;
+                }
+            }
+            try {
+                if (typeof val.toJSON === 'function') {
+                    return;
+                }
+            } catch (_) {
+                return;
+            }
+            if (typeof options.depthLimit !== 'undefined' && depth > options.depthLimit) {
+                setReplace(LIMIT_REPLACE_NODE, val, k, parent);
+                return;
+            }
+            if (typeof options.edgesLimit !== 'undefined' && edgeIndex + 1 > options.edgesLimit) {
+                setReplace(LIMIT_REPLACE_NODE, val, k, parent);
+                return;
+            }
+            stack.push(val);
+            if (Array.isArray(val)) {
+                for (i = 0; i < val.length; i++) {
+                    deterministicDecirc(val[i], i, i, stack, val, depth, options);
+                }
+            } else {
+                var tmp = {};
+                var keys = Object.keys(val).sort(compareFunction);
+                for (i = 0; i < keys.length; i++) {
+                    var key = keys[i];
+                    deterministicDecirc(val[key], key, i, stack, val, depth, options);
+                    tmp[key] = val[key];
+                }
+                if (typeof parent !== 'undefined') {
+                    arr.push([
+                        parent,
+                        k,
+                        val
+                    ]);
+                    parent[k] = tmp;
+                } else {
+                    return tmp;
+                }
+            }
+            stack.pop();
+        }
+    }
+    function replaceGetterValues(replacer) {
+        replacer = typeof replacer !== 'undefined' ? replacer : function (k, v) {
+            return v;
+        };
+        return function (key, val) {
+            if (replacerStack.length > 0) {
+                for (var i = 0; i < replacerStack.length; i++) {
+                    var part = replacerStack[i];
+                    if (part[1] === key && part[0] === val) {
+                        val = part[2];
+                        replacerStack.splice(i, 1);
+                        break;
+                    }
+                }
+            }
+            return replacer.call(this, key, val);
+        };
+    }
+});
+/*superagent@5.3.1#lib/is-object*/
 define('superagent/lib/is-object', function (require, exports, module) {
     'use strict';
+    function _typeof(obj) {
+        '@babel/helpers - typeof';
+        if (typeof Symbol === 'function' && typeof Symbol.iterator === 'symbol') {
+            _typeof = function _typeof(obj) {
+                return typeof obj;
+            };
+        } else {
+            _typeof = function _typeof(obj) {
+                return obj && typeof Symbol === 'function' && obj.constructor === Symbol && obj !== Symbol.prototype ? 'symbol' : typeof obj;
+            };
+        }
+        return _typeof(obj);
+    }
     function isObject(obj) {
-        return null !== obj && 'object' === typeof obj;
+        return obj !== null && _typeof(obj) === 'object';
     }
     module.exports = isObject;
 });
-/*superagent@3.8.3#lib/request-base*/
+/*superagent@5.3.1#lib/request-base*/
 define('superagent/lib/request-base', [
     'require',
     'exports',
@@ -5552,6 +5779,19 @@ define('superagent/lib/request-base', [
     'superagent/lib/is-object'
 ], function (require, exports, module) {
     'use strict';
+    function _typeof(obj) {
+        '@babel/helpers - typeof';
+        if (typeof Symbol === 'function' && typeof Symbol.iterator === 'symbol') {
+            _typeof = function _typeof(obj) {
+                return typeof obj;
+            };
+        } else {
+            _typeof = function _typeof(obj) {
+                return obj && typeof Symbol === 'function' && obj.constructor === Symbol && obj !== Symbol.prototype ? 'symbol' : typeof obj;
+            };
+        }
+        return _typeof(obj);
+    }
     var isObject = require('superagent/lib/is-object');
     module.exports = RequestBase;
     function RequestBase(obj) {
@@ -5560,18 +5800,21 @@ define('superagent/lib/request-base', [
     }
     function mixin(obj) {
         for (var key in RequestBase.prototype) {
-            obj[key] = RequestBase.prototype[key];
+            if (Object.prototype.hasOwnProperty.call(RequestBase.prototype, key))
+                obj[key] = RequestBase.prototype[key];
         }
         return obj;
     }
-    RequestBase.prototype.clearTimeout = function _clearTimeout() {
+    RequestBase.prototype.clearTimeout = function () {
         clearTimeout(this._timer);
         clearTimeout(this._responseTimeoutTimer);
+        clearTimeout(this._uploadTimeoutTimer);
         delete this._timer;
         delete this._responseTimeoutTimer;
+        delete this._uploadTimeoutTimer;
         return this;
     };
-    RequestBase.prototype.parse = function parse(fn) {
+    RequestBase.prototype.parse = function (fn) {
         this._parser = fn;
         return this;
     };
@@ -5579,31 +5822,37 @@ define('superagent/lib/request-base', [
         this._responseType = val;
         return this;
     };
-    RequestBase.prototype.serialize = function serialize(fn) {
+    RequestBase.prototype.serialize = function (fn) {
         this._serializer = fn;
         return this;
     };
-    RequestBase.prototype.timeout = function timeout(options) {
-        if (!options || 'object' !== typeof options) {
+    RequestBase.prototype.timeout = function (options) {
+        if (!options || _typeof(options) !== 'object') {
             this._timeout = options;
             this._responseTimeout = 0;
+            this._uploadTimeout = 0;
             return this;
         }
         for (var option in options) {
-            switch (option) {
-            case 'deadline':
-                this._timeout = options.deadline;
-                break;
-            case 'response':
-                this._responseTimeout = options.response;
-                break;
-            default:
-                console.warn('Unknown timeout option', option);
+            if (Object.prototype.hasOwnProperty.call(options, option)) {
+                switch (option) {
+                case 'deadline':
+                    this._timeout = options.deadline;
+                    break;
+                case 'response':
+                    this._responseTimeout = options.response;
+                    break;
+                case 'upload':
+                    this._uploadTimeout = options.upload;
+                    break;
+                default:
+                    console.warn('Unknown timeout option', option);
+                }
             }
         }
         return this;
     };
-    RequestBase.prototype.retry = function retry(count, fn) {
+    RequestBase.prototype.retry = function (count, fn) {
         if (arguments.length === 0 || count === true)
             count = 1;
         if (count <= 0)
@@ -5630,16 +5879,16 @@ define('superagent/lib/request-base', [
                     return true;
                 if (override === false)
                     return false;
-            } catch (e) {
-                console.error(e);
+            } catch (err_) {
+                console.error(err_);
             }
         }
-        if (res && res.status && res.status >= 500 && res.status != 501)
+        if (res && res.status && res.status >= 500 && res.status !== 501)
             return true;
         if (err) {
-            if (err.code && ~ERROR_CODES.indexOf(err.code))
+            if (err.code && ERROR_CODES.includes(err.code))
                 return true;
-            if (err.timeout && err.code == 'ECONNABORTED')
+            if (err.timeout && err.code === 'ECONNABORTED')
                 return true;
             if (err.crossDomain)
                 return true;
@@ -5654,35 +5903,52 @@ define('superagent/lib/request-base', [
         }
         this._aborted = false;
         this.timedout = false;
+        this.timedoutError = null;
         return this._end();
     };
-    RequestBase.prototype.then = function then(resolve, reject) {
+    RequestBase.prototype.then = function (resolve, reject) {
+        var _this = this;
         if (!this._fullfilledPromise) {
             var self = this;
             if (this._endCalled) {
                 console.warn('Warning: superagent request was sent twice, because both .end() and .then() were called. Never call .end() if you use promises');
             }
-            this._fullfilledPromise = new Promise(function (innerResolve, innerReject) {
+            this._fullfilledPromise = new Promise(function (resolve, reject) {
+                self.on('abort', function () {
+                    if (_this._maxRetries && _this._maxRetries > _this._retries) {
+                        return;
+                    }
+                    if (_this.timedout && _this.timedoutError) {
+                        reject(_this.timedoutError);
+                        return;
+                    }
+                    var err = new Error('Aborted');
+                    err.code = 'ABORTED';
+                    err.status = _this.status;
+                    err.method = _this.method;
+                    err.url = _this.url;
+                    reject(err);
+                });
                 self.end(function (err, res) {
                     if (err)
-                        innerReject(err);
+                        reject(err);
                     else
-                        innerResolve(res);
+                        resolve(res);
                 });
             });
         }
         return this._fullfilledPromise.then(resolve, reject);
     };
-    RequestBase.prototype['catch'] = function (cb) {
+    RequestBase.prototype.catch = function (cb) {
         return this.then(undefined, cb);
     };
-    RequestBase.prototype.use = function use(fn) {
+    RequestBase.prototype.use = function (fn) {
         fn(this);
         return this;
     };
     RequestBase.prototype.ok = function (cb) {
-        if ('function' !== typeof cb)
-            throw Error('Callback required');
+        if (typeof cb !== 'function')
+            throw new Error('Callback required');
         this._okCallback = cb;
         return this;
     };
@@ -5702,7 +5968,8 @@ define('superagent/lib/request-base', [
     RequestBase.prototype.set = function (field, val) {
         if (isObject(field)) {
             for (var key in field) {
-                this.set(key, field[key]);
+                if (Object.prototype.hasOwnProperty.call(field, key))
+                    this.set(key, field[key]);
             }
             return this;
         }
@@ -5716,29 +5983,31 @@ define('superagent/lib/request-base', [
         return this;
     };
     RequestBase.prototype.field = function (name, val) {
-        if (null === name || undefined === name) {
+        if (name === null || undefined === name) {
             throw new Error('.field(name, val) name can not be empty');
         }
         if (this._data) {
-            console.error('.field() can\'t be used if .send() is used. Please use only .send() or only .field() & .attach()');
+            throw new Error('.field() can\'t be used if .send() is used. Please use only .send() or only .field() & .attach()');
         }
         if (isObject(name)) {
             for (var key in name) {
-                this.field(key, name[key]);
+                if (Object.prototype.hasOwnProperty.call(name, key))
+                    this.field(key, name[key]);
             }
             return this;
         }
         if (Array.isArray(val)) {
             for (var i in val) {
-                this.field(name, val[i]);
+                if (Object.prototype.hasOwnProperty.call(val, i))
+                    this.field(name, val[i]);
             }
             return this;
         }
-        if (null === val || undefined === val) {
+        if (val === null || undefined === val) {
             throw new Error('.field(name, val) val can not be empty');
         }
-        if ('boolean' === typeof val) {
-            val = '' + val;
+        if (typeof val === 'boolean') {
+            val = String(val);
         }
         this._getFormData().append(name, val);
         return this;
@@ -5748,8 +6017,10 @@ define('superagent/lib/request-base', [
             return this;
         }
         this._aborted = true;
-        this.xhr && this.xhr.abort();
-        this.req && this.req.abort();
+        if (this.xhr)
+            this.xhr.abort();
+        if (this.req)
+            this.req.abort();
         this.clearTimeout();
         this.emit('abort');
         return this;
@@ -5757,20 +6028,22 @@ define('superagent/lib/request-base', [
     RequestBase.prototype._auth = function (user, pass, options, base64Encoder) {
         switch (options.type) {
         case 'basic':
-            this.set('Authorization', 'Basic ' + base64Encoder(user + ':' + pass));
+            this.set('Authorization', 'Basic '.concat(base64Encoder(''.concat(user, ':').concat(pass))));
             break;
         case 'auto':
             this.username = user;
             this.password = pass;
             break;
         case 'bearer':
-            this.set('Authorization', 'Bearer ' + user);
+            this.set('Authorization', 'Bearer '.concat(user));
+            break;
+        default:
             break;
         }
         return this;
     };
     RequestBase.prototype.withCredentials = function (on) {
-        if (on == undefined)
+        if (on === undefined)
             on = true;
         this._withCredentials = on;
         return this;
@@ -5780,8 +6053,8 @@ define('superagent/lib/request-base', [
         return this;
     };
     RequestBase.prototype.maxResponseSize = function (n) {
-        if ('number' !== typeof n) {
-            throw TypeError('Invalid argument');
+        if (typeof n !== 'number') {
+            throw new TypeError('Invalid argument');
         }
         this._maxResponseSize = n;
         return this;
@@ -5798,7 +6071,7 @@ define('superagent/lib/request-base', [
         var isObj = isObject(data);
         var type = this._header['content-type'];
         if (this._formData) {
-            console.error('.send() can\'t be used if .attach() or .field() is used. Please use only .send() or only .field() & .attach()');
+            throw new Error('.send() can\'t be used if .attach() or .field() is used. Please use only .send() or only .field() & .attach()');
         }
         if (isObj && !this._data) {
             if (Array.isArray(data)) {
@@ -5807,18 +6080,19 @@ define('superagent/lib/request-base', [
                 this._data = {};
             }
         } else if (data && this._data && this._isHost(this._data)) {
-            throw Error('Can\'t merge these send calls');
+            throw new Error('Can\'t merge these send calls');
         }
         if (isObj && isObject(this._data)) {
             for (var key in data) {
-                this._data[key] = data[key];
+                if (Object.prototype.hasOwnProperty.call(data, key))
+                    this._data[key] = data[key];
             }
-        } else if ('string' == typeof data) {
+        } else if (typeof data === 'string') {
             if (!type)
                 this.type('form');
             type = this._header['content-type'];
-            if ('application/x-www-form-urlencoded' == type) {
-                this._data = this._data ? this._data + '&' + data : data;
+            if (type === 'application/x-www-form-urlencoded') {
+                this._data = this._data ? ''.concat(this._data, '&').concat(data) : data;
             } else {
                 this._data = (this._data || '') + data;
             }
@@ -5839,34 +6113,35 @@ define('superagent/lib/request-base', [
     RequestBase.prototype._finalizeQueryString = function () {
         var query = this._query.join('&');
         if (query) {
-            this.url += (this.url.indexOf('?') >= 0 ? '&' : '?') + query;
+            this.url += (this.url.includes('?') ? '&' : '?') + query;
         }
         this._query.length = 0;
         if (this._sort) {
             var index = this.url.indexOf('?');
             if (index >= 0) {
-                var queryArr = this.url.substring(index + 1).split('&');
-                if ('function' === typeof this._sort) {
+                var queryArr = this.url.slice(index + 1).split('&');
+                if (typeof this._sort === 'function') {
                     queryArr.sort(this._sort);
                 } else {
                     queryArr.sort();
                 }
-                this.url = this.url.substring(0, index) + '?' + queryArr.join('&');
+                this.url = this.url.slice(0, index) + '?' + queryArr.join('&');
             }
         }
     };
     RequestBase.prototype._appendQueryString = function () {
-        console.trace('Unsupported');
+        console.warn('Unsupported');
     };
     RequestBase.prototype._timeoutError = function (reason, timeout, errno) {
         if (this._aborted) {
             return;
         }
-        var err = new Error(reason + timeout + 'ms exceeded');
+        var err = new Error(''.concat(reason + timeout, 'ms exceeded'));
         err.timeout = timeout;
         err.code = 'ECONNABORTED';
         err.errno = errno;
         this.timedout = true;
+        this.timedoutError = err;
         this.abort();
         this.callback(err);
     };
@@ -5884,7 +6159,7 @@ define('superagent/lib/request-base', [
         }
     };
 });
-/*superagent@3.8.3#lib/utils*/
+/*superagent@5.3.1#lib/utils*/
 define('superagent/lib/utils', function (require, exports, module) {
     'use strict';
     exports.type = function (str) {
@@ -5913,15 +6188,15 @@ define('superagent/lib/utils', function (require, exports, module) {
         delete header['content-type'];
         delete header['content-length'];
         delete header['transfer-encoding'];
-        delete header['host'];
+        delete header.host;
         if (changesOrigin) {
-            delete header['authorization'];
-            delete header['cookie'];
+            delete header.authorization;
+            delete header.cookie;
         }
         return header;
     };
 });
-/*superagent@3.8.3#lib/response-base*/
+/*superagent@5.3.1#lib/response-base*/
 define('superagent/lib/response-base', [
     'require',
     'exports',
@@ -5937,7 +6212,8 @@ define('superagent/lib/response-base', [
     }
     function mixin(obj) {
         for (var key in ResponseBase.prototype) {
-            obj[key] = ResponseBase.prototype[key];
+            if (Object.prototype.hasOwnProperty.call(ResponseBase.prototype, key))
+                obj[key] = ResponseBase.prototype[key];
         }
         return obj;
     }
@@ -5948,39 +6224,78 @@ define('superagent/lib/response-base', [
         var ct = header['content-type'] || '';
         this.type = utils.type(ct);
         var params = utils.params(ct);
-        for (var key in params)
-            this[key] = params[key];
+        for (var key in params) {
+            if (Object.prototype.hasOwnProperty.call(params, key))
+                this[key] = params[key];
+        }
         this.links = {};
         try {
             if (header.link) {
                 this.links = utils.parseLinks(header.link);
             }
-        } catch (err) {
+        } catch (_unused) {
         }
     };
     ResponseBase.prototype._setStatusProperties = function (status) {
         var type = status / 100 | 0;
-        this.status = this.statusCode = status;
+        this.statusCode = status;
+        this.status = this.statusCode;
         this.statusType = type;
-        this.info = 1 == type;
-        this.ok = 2 == type;
-        this.redirect = 3 == type;
-        this.clientError = 4 == type;
-        this.serverError = 5 == type;
-        this.error = 4 == type || 5 == type ? this.toError() : false;
-        this.created = 201 == status;
-        this.accepted = 202 == status;
-        this.noContent = 204 == status;
-        this.badRequest = 400 == status;
-        this.unauthorized = 401 == status;
-        this.notAcceptable = 406 == status;
-        this.forbidden = 403 == status;
-        this.notFound = 404 == status;
-        this.unprocessableEntity = 422 == status;
+        this.info = type === 1;
+        this.ok = type === 2;
+        this.redirect = type === 3;
+        this.clientError = type === 4;
+        this.serverError = type === 5;
+        this.error = type === 4 || type === 5 ? this.toError() : false;
+        this.created = status === 201;
+        this.accepted = status === 202;
+        this.noContent = status === 204;
+        this.badRequest = status === 400;
+        this.unauthorized = status === 401;
+        this.notAcceptable = status === 406;
+        this.forbidden = status === 403;
+        this.notFound = status === 404;
+        this.unprocessableEntity = status === 422;
     };
 });
-/*superagent@3.8.3#lib/agent-base*/
+/*superagent@5.3.1#lib/agent-base*/
 define('superagent/lib/agent-base', function (require, exports, module) {
+    'use strict';
+    function _toConsumableArray(arr) {
+        return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread();
+    }
+    function _nonIterableSpread() {
+        throw new TypeError('Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.');
+    }
+    function _unsupportedIterableToArray(o, minLen) {
+        if (!o)
+            return;
+        if (typeof o === 'string')
+            return _arrayLikeToArray(o, minLen);
+        var n = Object.prototype.toString.call(o).slice(8, -1);
+        if (n === 'Object' && o.constructor)
+            n = o.constructor.name;
+        if (n === 'Map' || n === 'Set')
+            return Array.from(o);
+        if (n === 'Arguments' || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n))
+            return _arrayLikeToArray(o, minLen);
+    }
+    function _iterableToArray(iter) {
+        if (typeof Symbol !== 'undefined' && Symbol.iterator in Object(iter))
+            return Array.from(iter);
+    }
+    function _arrayWithoutHoles(arr) {
+        if (Array.isArray(arr))
+            return _arrayLikeToArray(arr);
+    }
+    function _arrayLikeToArray(arr, len) {
+        if (len == null || len > arr.length)
+            len = arr.length;
+        for (var i = 0, arr2 = new Array(len); i < len; i++) {
+            arr2[i] = arr[i];
+        }
+        return arr2;
+    }
     function Agent() {
         this._defaults = [];
     }
@@ -6005,83 +6320,103 @@ define('superagent/lib/agent-base', function (require, exports, module) {
         'ca',
         'key',
         'pfx',
-        'cert'
+        'cert',
+        'disableTLSCerts'
     ].forEach(function (fn) {
         Agent.prototype[fn] = function () {
+            for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+                args[_key] = arguments[_key];
+            }
             this._defaults.push({
                 fn: fn,
-                arguments: arguments
+                args: args
             });
             return this;
         };
     });
     Agent.prototype._setDefaults = function (req) {
         this._defaults.forEach(function (def) {
-            req[def.fn].apply(req, def.arguments);
+            req[def.fn].apply(req, _toConsumableArray(def.args));
         });
     };
     module.exports = Agent;
 });
-/*superagent@3.8.3#lib/client*/
+/*superagent@5.3.1#lib/client*/
 define('superagent/lib/client', [
     'require',
     'exports',
     'module',
     'component-emitter',
+    'fast-safe-stringify',
     'superagent/lib/request-base',
     'superagent/lib/is-object',
     'superagent/lib/response-base',
     'superagent/lib/agent-base'
 ], function (require, exports, module) {
+    'use strict';
+    function _typeof(obj) {
+        '@babel/helpers - typeof';
+        if (typeof Symbol === 'function' && typeof Symbol.iterator === 'symbol') {
+            _typeof = function _typeof(obj) {
+                return typeof obj;
+            };
+        } else {
+            _typeof = function _typeof(obj) {
+                return obj && typeof Symbol === 'function' && obj.constructor === Symbol && obj !== Symbol.prototype ? 'symbol' : typeof obj;
+            };
+        }
+        return _typeof(obj);
+    }
     var root;
     if (typeof window !== 'undefined') {
         root = window;
-    } else if (typeof self !== 'undefined') {
-        root = self;
-    } else {
+    } else if (typeof self === 'undefined') {
         console.warn('Using browser-only version of superagent in non-browser environment');
-        root = this;
+        root = void 0;
+    } else {
+        root = self;
     }
     var Emitter = require('component-emitter');
+    var safeStringify = require('fast-safe-stringify');
     var RequestBase = require('superagent/lib/request-base');
     var isObject = require('superagent/lib/is-object');
     var ResponseBase = require('superagent/lib/response-base');
     var Agent = require('superagent/lib/agent-base');
     function noop() {
     }
-    ;
-    var request = exports = module.exports = function (method, url) {
-        if ('function' == typeof url) {
+    module.exports = function (method, url) {
+        if (typeof url === 'function') {
             return new exports.Request('GET', method).end(url);
         }
-        if (1 == arguments.length) {
+        if (arguments.length === 1) {
             return new exports.Request('GET', method);
         }
         return new exports.Request(method, url);
     };
+    exports = module.exports;
+    var request = exports;
     exports.Request = Request;
     request.getXHR = function () {
-        if (root.XMLHttpRequest && (!root.location || 'file:' != root.location.protocol || !root.ActiveXObject)) {
+        if (root.XMLHttpRequest && (!root.location || root.location.protocol !== 'file:' || !root.ActiveXObject)) {
             return new XMLHttpRequest();
-        } else {
-            try {
-                return new ActiveXObject('Microsoft.XMLHTTP');
-            } catch (e) {
-            }
-            try {
-                return new ActiveXObject('Msxml2.XMLHTTP.6.0');
-            } catch (e) {
-            }
-            try {
-                return new ActiveXObject('Msxml2.XMLHTTP.3.0');
-            } catch (e) {
-            }
-            try {
-                return new ActiveXObject('Msxml2.XMLHTTP');
-            } catch (e) {
-            }
         }
-        throw Error('Browser-only version of superagent could not find XHR');
+        try {
+            return new ActiveXObject('Microsoft.XMLHTTP');
+        } catch (_unused) {
+        }
+        try {
+            return new ActiveXObject('Msxml2.XMLHTTP.6.0');
+        } catch (_unused2) {
+        }
+        try {
+            return new ActiveXObject('Msxml2.XMLHTTP.3.0');
+        } catch (_unused3) {
+        }
+        try {
+            return new ActiveXObject('Msxml2.XMLHTTP');
+        } catch (_unused4) {
+        }
+        throw new Error('Browser-only version of superagent could not find XHR');
     };
     var trim = ''.trim ? function (s) {
         return s.trim();
@@ -6093,25 +6428,29 @@ define('superagent/lib/client', [
             return obj;
         var pairs = [];
         for (var key in obj) {
-            pushEncodedKeyValuePair(pairs, key, obj[key]);
+            if (Object.prototype.hasOwnProperty.call(obj, key))
+                pushEncodedKeyValuePair(pairs, key, obj[key]);
         }
         return pairs.join('&');
     }
     function pushEncodedKeyValuePair(pairs, key, val) {
-        if (val != null) {
-            if (Array.isArray(val)) {
-                val.forEach(function (v) {
-                    pushEncodedKeyValuePair(pairs, key, v);
-                });
-            } else if (isObject(val)) {
-                for (var subkey in val) {
-                    pushEncodedKeyValuePair(pairs, key + '[' + subkey + ']', val[subkey]);
-                }
-            } else {
-                pairs.push(encodeURIComponent(key) + '=' + encodeURIComponent(val));
+        if (val === undefined)
+            return;
+        if (val === null) {
+            pairs.push(encodeURI(key));
+            return;
+        }
+        if (Array.isArray(val)) {
+            val.forEach(function (v) {
+                pushEncodedKeyValuePair(pairs, key, v);
+            });
+        } else if (isObject(val)) {
+            for (var subkey in val) {
+                if (Object.prototype.hasOwnProperty.call(val, subkey))
+                    pushEncodedKeyValuePair(pairs, ''.concat(key, '[').concat(subkey, ']'), val[subkey]);
             }
-        } else if (val === null) {
-            pairs.push(encodeURIComponent(key));
+        } else {
+            pairs.push(encodeURI(key) + '=' + encodeURIComponent(val));
         }
     }
     request.serializeObject = serialize;
@@ -6123,7 +6462,7 @@ define('superagent/lib/client', [
         for (var i = 0, len = pairs.length; i < len; ++i) {
             pair = pairs[i];
             pos = pair.indexOf('=');
-            if (pos == -1) {
+            if (pos === -1) {
                 obj[decodeURIComponent(pair)] = '';
             } else {
                 obj[decodeURIComponent(pair.slice(0, pos))] = decodeURIComponent(pair.slice(pos + 1));
@@ -6137,12 +6476,12 @@ define('superagent/lib/client', [
         json: 'application/json',
         xml: 'text/xml',
         urlencoded: 'application/x-www-form-urlencoded',
-        'form': 'application/x-www-form-urlencoded',
+        form: 'application/x-www-form-urlencoded',
         'form-data': 'application/x-www-form-urlencoded'
     };
     request.serialize = {
         'application/x-www-form-urlencoded': serialize,
-        'application/json': JSON.stringify
+        'application/json': safeStringify
     };
     request.parse = {
         'application/x-www-form-urlencoded': parseString,
@@ -6168,25 +6507,26 @@ define('superagent/lib/client', [
         return fields;
     }
     function isJSON(mime) {
-        return /[\/+]json($|[^-\w])/.test(mime);
+        return /[/+]json($|[^-\w])/.test(mime);
     }
     function Response(req) {
         this.req = req;
         this.xhr = this.req.xhr;
-        this.text = this.req.method != 'HEAD' && (this.xhr.responseType === '' || this.xhr.responseType === 'text') || typeof this.xhr.responseType === 'undefined' ? this.xhr.responseText : null;
+        this.text = this.req.method !== 'HEAD' && (this.xhr.responseType === '' || this.xhr.responseType === 'text') || typeof this.xhr.responseType === 'undefined' ? this.xhr.responseText : null;
         this.statusText = this.req.xhr.statusText;
         var status = this.xhr.status;
         if (status === 1223) {
             status = 204;
         }
         this._setStatusProperties(status);
-        this.header = this.headers = parseHeader(this.xhr.getAllResponseHeaders());
+        this.headers = parseHeader(this.xhr.getAllResponseHeaders());
+        this.header = this.headers;
         this.header['content-type'] = this.xhr.getResponseHeader('content-type');
         this._setHeaderProperties(this.header);
-        if (null === this.text && req._responseType) {
+        if (this.text === null && req._responseType) {
             this.body = this.xhr.response;
         } else {
-            this.body = this.req.method != 'HEAD' ? this._parseBody(this.text ? this.text : this.xhr.response) : null;
+            this.body = this.req.method === 'HEAD' ? null : this._parseBody(this.text ? this.text : this.xhr.response);
         }
     }
     ResponseBase(Response.prototype);
@@ -6198,13 +6538,13 @@ define('superagent/lib/client', [
         if (!parse && isJSON(this.type)) {
             parse = request.parse['application/json'];
         }
-        return parse && str && (str.length || str instanceof Object) ? parse(str) : null;
+        return parse && str && (str.length > 0 || str instanceof Object) ? parse(str) : null;
     };
     Response.prototype.toError = function () {
         var req = this.req;
         var method = req.method;
         var url = req.url;
-        var msg = 'cannot ' + method + ' ' + url + ' (' + this.status + ')';
+        var msg = 'cannot '.concat(method, ' ').concat(url, ' (').concat(this.status, ')');
         var err = new Error(msg);
         err.status = this.status;
         err.method = method;
@@ -6224,12 +6564,12 @@ define('superagent/lib/client', [
             var res = null;
             try {
                 res = new Response(self);
-            } catch (e) {
+            } catch (err_) {
                 err = new Error('Parser is unable to parse the response');
                 err.parse = true;
-                err.original = e;
+                err.original = err_;
                 if (self.xhr) {
-                    err.rawResponse = typeof self.xhr.responseType == 'undefined' ? self.xhr.responseText : self.xhr.response;
+                    err.rawResponse = typeof self.xhr.responseType === 'undefined' ? self.xhr.responseText : self.xhr.response;
                     err.status = self.xhr.status ? self.xhr.status : null;
                     err.statusCode = err.status;
                 } else {
@@ -6242,10 +6582,10 @@ define('superagent/lib/client', [
             var new_err;
             try {
                 if (!self._isResponseOK(res)) {
-                    new_err = new Error(res.statusText || 'Unsuccessful HTTP response');
+                    new_err = new Error(res.statusText || res.text || 'Unsuccessful HTTP response');
                 }
-            } catch (custom_err) {
-                new_err = custom_err;
+            } catch (err_) {
+                new_err = err_;
             }
             if (new_err) {
                 new_err.original = err;
@@ -6268,17 +6608,17 @@ define('superagent/lib/client', [
         return this;
     };
     Request.prototype.auth = function (user, pass, options) {
-        if (1 === arguments.length)
+        if (arguments.length === 1)
             pass = '';
-        if (typeof pass === 'object' && pass !== null) {
+        if (_typeof(pass) === 'object' && pass !== null) {
             options = pass;
             pass = '';
         }
         if (!options) {
-            options = { type: 'function' === typeof btoa ? 'basic' : 'auto' };
+            options = { type: typeof btoa === 'function' ? 'basic' : 'auto' };
         }
-        var encoder = function (string) {
-            if ('function' === typeof btoa) {
+        var encoder = function encoder(string) {
+            if (typeof btoa === 'function') {
                 return btoa(string);
             }
             throw new Error('Cannot use basic auth, btoa is not a function');
@@ -6286,7 +6626,7 @@ define('superagent/lib/client', [
         return this._auth(user, pass, options, encoder);
     };
     Request.prototype.query = function (val) {
-        if ('string' != typeof val)
+        if (typeof val !== 'string')
             val = serialize(val);
         if (val)
             this._query.push(val);
@@ -6295,7 +6635,7 @@ define('superagent/lib/client', [
     Request.prototype.attach = function (field, file, options) {
         if (file) {
             if (this._data) {
-                throw Error('superagent can\'t mix .send() and .attach()');
+                throw new Error('superagent can\'t mix .send() and .attach()');
             }
             this._getFormData().append(field, file, options || file.name);
         }
@@ -6328,15 +6668,18 @@ define('superagent/lib/client', [
         err.url = this.url;
         this.callback(err);
     };
-    Request.prototype.buffer = Request.prototype.ca = Request.prototype.agent = function () {
+    Request.prototype.agent = function () {
         console.warn('This is not supported in browser version of superagent');
         return this;
     };
-    Request.prototype.pipe = Request.prototype.write = function () {
-        throw Error('Streaming is not supported in browser version of superagent');
+    Request.prototype.ca = Request.prototype.agent;
+    Request.prototype.buffer = Request.prototype.ca;
+    Request.prototype.write = function () {
+        throw new Error('Streaming is not supported in browser version of superagent');
     };
-    Request.prototype._isHost = function _isHost(obj) {
-        return obj && 'object' === typeof obj && !Array.isArray(obj) && Object.prototype.toString.call(obj) !== '[object Object]';
+    Request.prototype.pipe = Request.prototype.write;
+    Request.prototype._isHost = function (obj) {
+        return obj && _typeof(obj) === 'object' && !Array.isArray(obj) && Object.prototype.toString.call(obj) !== '[object Object]';
     };
     Request.prototype.end = function (fn) {
         if (this._endCalled) {
@@ -6345,11 +6688,22 @@ define('superagent/lib/client', [
         this._endCalled = true;
         this._callback = fn || noop;
         this._finalizeQueryString();
-        return this._end();
+        this._end();
+    };
+    Request.prototype._setUploadTimeout = function () {
+        var self = this;
+        if (this._uploadTimeout && !this._uploadTimeoutTimer) {
+            this._uploadTimeoutTimer = setTimeout(function () {
+                self._timeoutError('Upload timeout of ', self._uploadTimeout, 'ETIMEDOUT');
+            }, this._uploadTimeout);
+        }
     };
     Request.prototype._end = function () {
+        if (this._aborted)
+            return this.callback(new Error('The request has been aborted even before .end() was called'));
         var self = this;
-        var xhr = this.xhr = request.getXHR();
+        this.xhr = request.getXHR();
+        var xhr = this.xhr;
         var data = this._formData || this._data;
         this._setTimeouts();
         xhr.onreadystatechange = function () {
@@ -6357,13 +6711,13 @@ define('superagent/lib/client', [
             if (readyState >= 2 && self._responseTimeoutTimer) {
                 clearTimeout(self._responseTimeoutTimer);
             }
-            if (4 != readyState) {
+            if (readyState !== 4) {
                 return;
             }
             var status;
             try {
                 status = xhr.status;
-            } catch (e) {
+            } catch (_unused5) {
                 status = 0;
             }
             if (!status) {
@@ -6373,21 +6727,27 @@ define('superagent/lib/client', [
             }
             self.emit('end');
         };
-        var handleProgress = function (direction, e) {
+        var handleProgress = function handleProgress(direction, e) {
             if (e.total > 0) {
                 e.percent = e.loaded / e.total * 100;
+                if (e.percent === 100) {
+                    clearTimeout(self._uploadTimeoutTimer);
+                }
             }
             e.direction = direction;
             self.emit('progress', e);
         };
         if (this.hasListeners('progress')) {
             try {
-                xhr.onprogress = handleProgress.bind(null, 'download');
+                xhr.addEventListener('progress', handleProgress.bind(null, 'download'));
                 if (xhr.upload) {
-                    xhr.upload.onprogress = handleProgress.bind(null, 'upload');
+                    xhr.upload.addEventListener('progress', handleProgress.bind(null, 'upload'));
                 }
-            } catch (e) {
+            } catch (_unused6) {
             }
+        }
+        if (xhr.upload) {
+            this._setUploadTimeout();
         }
         try {
             if (this.username && this.password) {
@@ -6400,27 +6760,26 @@ define('superagent/lib/client', [
         }
         if (this._withCredentials)
             xhr.withCredentials = true;
-        if (!this._formData && 'GET' != this.method && 'HEAD' != this.method && 'string' != typeof data && !this._isHost(data)) {
+        if (!this._formData && this.method !== 'GET' && this.method !== 'HEAD' && typeof data !== 'string' && !this._isHost(data)) {
             var contentType = this._header['content-type'];
-            var serialize = this._serializer || request.serialize[contentType ? contentType.split(';')[0] : ''];
-            if (!serialize && isJSON(contentType)) {
-                serialize = request.serialize['application/json'];
+            var _serialize = this._serializer || request.serialize[contentType ? contentType.split(';')[0] : ''];
+            if (!_serialize && isJSON(contentType)) {
+                _serialize = request.serialize['application/json'];
             }
-            if (serialize)
-                data = serialize(data);
+            if (_serialize)
+                data = _serialize(data);
         }
         for (var field in this.header) {
-            if (null == this.header[field])
+            if (this.header[field] === null)
                 continue;
-            if (this.header.hasOwnProperty(field))
+            if (Object.prototype.hasOwnProperty.call(this.header, field))
                 xhr.setRequestHeader(field, this.header[field]);
         }
         if (this._responseType) {
             xhr.responseType = this._responseType;
         }
         this.emit('request', this);
-        xhr.send(typeof data !== 'undefined' ? data : null);
-        return this;
+        xhr.send(typeof data === 'undefined' ? null : data);
     };
     request.agent = function () {
         return new Agent();
@@ -6442,11 +6801,13 @@ define('superagent/lib/client', [
             return req;
         };
     });
-    Agent.prototype.del = Agent.prototype['delete'];
+    Agent.prototype.del = Agent.prototype.delete;
     request.get = function (url, data, fn) {
         var req = request('GET', url);
-        if ('function' == typeof data)
-            fn = data, data = null;
+        if (typeof data === 'function') {
+            fn = data;
+            data = null;
+        }
         if (data)
             req.query(data);
         if (fn)
@@ -6455,8 +6816,10 @@ define('superagent/lib/client', [
     };
     request.head = function (url, data, fn) {
         var req = request('HEAD', url);
-        if ('function' == typeof data)
-            fn = data, data = null;
+        if (typeof data === 'function') {
+            fn = data;
+            data = null;
+        }
         if (data)
             req.query(data);
         if (fn)
@@ -6465,8 +6828,10 @@ define('superagent/lib/client', [
     };
     request.options = function (url, data, fn) {
         var req = request('OPTIONS', url);
-        if ('function' == typeof data)
-            fn = data, data = null;
+        if (typeof data === 'function') {
+            fn = data;
+            data = null;
+        }
         if (data)
             req.send(data);
         if (fn)
@@ -6475,20 +6840,24 @@ define('superagent/lib/client', [
     };
     function del(url, data, fn) {
         var req = request('DELETE', url);
-        if ('function' == typeof data)
-            fn = data, data = null;
+        if (typeof data === 'function') {
+            fn = data;
+            data = null;
+        }
         if (data)
             req.send(data);
         if (fn)
             req.end(fn);
         return req;
     }
-    request['del'] = del;
-    request['delete'] = del;
+    request.del = del;
+    request.delete = del;
     request.patch = function (url, data, fn) {
         var req = request('PATCH', url);
-        if ('function' == typeof data)
-            fn = data, data = null;
+        if (typeof data === 'function') {
+            fn = data;
+            data = null;
+        }
         if (data)
             req.send(data);
         if (fn)
@@ -6497,8 +6866,10 @@ define('superagent/lib/client', [
     };
     request.post = function (url, data, fn) {
         var req = request('POST', url);
-        if ('function' == typeof data)
-            fn = data, data = null;
+        if (typeof data === 'function') {
+            fn = data;
+            data = null;
+        }
         if (data)
             req.send(data);
         if (fn)
@@ -6507,8 +6878,10 @@ define('superagent/lib/client', [
     };
     request.put = function (url, data, fn) {
         var req = request('PUT', url);
-        if ('function' == typeof data)
-            fn = data, data = null;
+        if (typeof data === 'function') {
+            fn = data;
+            data = null;
+        }
         if (data)
             req.send(data);
         if (fn)
