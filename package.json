@@ -33,6 +33,9 @@
       "socket.io-client/dist/socket.io": {
         "format": "amd"
       }
+    },
+    "map": {
+        "util.inspect": "node_modules/object-inspect/util.inspect"
     }
   },
   "author": "David Luecke <david@bitovi.com>",
@@ -62,7 +65,7 @@
     "mocha": "^3.0.2",
     "qunit": "^2.4.1",
     "socket.io-client": "^1.7.2",
-    "steal": "^1.0.0-rc.3",
-    "steal-tools": "^1.0.0-rc.1"
+    "steal": "^2.2.4",
+    "steal-tools": "^2.2.6"
   }
 }

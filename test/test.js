@@ -60,7 +60,7 @@ function mountMockApp (onLog) {
   app.use('api/tests', expectationService('api/tests'));
   app.use('api/coverages', expectationService('api/coverages'));
   app.use('api/logs', expectationService('api/logs'));
-
+    app.listen();
   window.TesteeMock = {app: app};
 
   return function unmountMockApp () {

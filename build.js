@@ -7,11 +7,15 @@ stealTools.export({
   },
   outputs: {
     '+standalone': {
-      dest: path.join(__dirname, 'dist', 'testee.js')
+      dest: path.join(__dirname, 'dist', 'testee.js'),
+      addProcessShim: false,
+      noProcessShim: true
     },
     '+standalone min': {
       dest: path.join(__dirname, 'dist', 'testee.min.js'),
-      minify: true
+      minify: true,
+      addProcessShim: false,
+      noProcessShim: true
     }
   }
 }).catch(e => console.log(e));
