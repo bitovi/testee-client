@@ -1,6 +1,6 @@
 {
   "name": "testee-client",
-  "version": "0.5.5",
+  "version": "0.5.6",
   "description": "Testee testing framework client adapters",
   "main": "src/index",
   "scripts": {
@@ -35,7 +35,7 @@
       }
     },
     "map": {
-        "util.inspect": "node_modules/object-inspect/util.inspect"
+      "util.inspect": "node_modules/object-inspect/util.inspect"
     }
   },
   "author": "David Luecke <david@bitovi.com>",
